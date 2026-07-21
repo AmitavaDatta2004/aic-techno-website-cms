@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/* ─── CMS Design Tokens ─────────────────────────────────────────────────────
+   Defined as CSS custom properties AND exposed via @theme inline so Tailwind
+   utility classes (bg-cms-bg, text-cms-muted, etc.) work out of the box.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surfaces */
+  --cms-bg:        #09090F;
+  --cms-surface:   #111118;
+  --cms-surface-2: #18181f;
+  --cms-border:    rgba(255, 255, 255, 0.08);
+  --cms-border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Accent palette */
+  --cms-accent:    #6366F1;   /* Indigo — primary actions */
+  --cms-accent-hover: #4F46E5;
+  --cms-success:   #10B981;   /* Emerald */
+  --cms-danger:    #EF4444;   /* Red */
+  --cms-warning:   #F59E0B;   /* Amber */
+
+  /* Text */
+  --cms-text:      #F1F5F9;
+  --cms-text-2:    #94A3B8;
+  --cms-muted:     #475569;
+
+  /* Font */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-cms-bg:           var(--cms-bg);
+  --color-cms-surface:      var(--cms-surface);
+  --color-cms-surface-2:    var(--cms-surface-2);
+  --color-cms-border:       var(--cms-border);
+  --color-cms-accent:       var(--cms-accent);
+  --color-cms-accent-hover: var(--cms-accent-hover);
+  --color-cms-success:      var(--cms-success);
+  --color-cms-danger:       var(--cms-danger);
+  --color-cms-warning:      var(--cms-warning);
+  --color-cms-text:         var(--cms-text);
+  --color-cms-text-2:       var(--cms-text-2);
+  --color-cms-muted:        var(--cms-muted);
+  --font-sans:              var(--font-sans);
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--cms-bg);
+  color: var(--cms-text);
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+/* Subtle scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--cms-bg); }
+::-webkit-scrollbar-thumb { background: var(--cms-muted); border-radius: 4px; }
+
+/* ─── Global utility ─────────────────────────────────────────────────────── */
+
+.cms-card {
+  background: var(--cms-surface);
+  border: 1px solid var(--cms-border);
+  border-radius: 12px;
+}
+
+.cms-input {
+  background: var(--cms-surface-2);
+  border: 1px solid var(--cms-border);
+  border-radius: 8px;
+  color: var(--cms-text);
+  padding: 10px 14px;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.cms-input:focus {
+  border-color: var(--cms-accent);
+}
+
+.cms-input::placeholder {
+  color: var(--cms-muted);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.animate-fade-in   { animation: fadeIn 0.25s ease both; }
+.animate-slide-in  { animation: slideInRight 0.25s ease both; }
+.animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
