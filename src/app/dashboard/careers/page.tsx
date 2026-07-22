@@ -53,13 +53,13 @@ export default function CareersPage() {
     if (career) {
       setEditingId(career.id);
       setFormData({
-        dept: career.dept,
-        title: career.title,
-        icon: career.icon,
-        tags: career.tags.join(", "),
-        applyLink: career.applyLink,
-        order: career.order,
-        active: career.active,
+        dept: career.dept ?? "",
+        title: career.title ?? "",
+        icon: career.icon ?? "💼",
+        tags: (career.tags ?? []).join(", "),
+        applyLink: career.applyLink ?? "",
+        order: career.order ?? 0,
+        active: career.active ?? true,
       });
     } else {
       setEditingId(null);
@@ -192,16 +192,16 @@ export default function CareersPage() {
                       key={career.id}
                       className="hover:bg-[var(--cms-surface-2)] transition-colors group"
                     >
-                      <td className="p-4 text-xl">{career.icon}</td>
+                      <td className="p-4 text-xl">{career.icon ?? '💼'}</td>
                       <td className="p-4 text-sm font-medium text-[var(--cms-text-2)]">
-                        {career.dept}
+                        {career.dept ?? '—'}
                       </td>
                       <td className="p-4 text-sm font-bold text-[var(--cms-text)]">
-                        {career.title}
+                        {career.title ?? '—'}
                       </td>
                       <td className="p-4">
                         <div className="flex flex-wrap gap-2">
-                          {career.tags.map((tag, idx) => (
+                          {(career.tags ?? []).map((tag, idx) => (
                             <span
                               key={idx}
                               className="px-2 py-1 text-xs font-semibold rounded-md bg-[var(--cms-accent)]/10 text-[var(--cms-accent)]"

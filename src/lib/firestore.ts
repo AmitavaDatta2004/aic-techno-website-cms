@@ -118,14 +118,17 @@ function snapToArray<T>(snap: QuerySnapshot<DocumentData>): T[] {
 const MENTORS = "mentors";
 
 export async function getMentors(): Promise<Mentor[]> {
-  const q = query(collection(db, MENTORS), orderBy("order", "asc"));
-  const snap = await getDocs(q);
-  return snapToArray<Mentor>(snap);
+  const snap = await getDocs(collection(db, MENTORS));
+  const items = snapToArray<Mentor>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function subscribeMentors(cb: (mentors: Mentor[]) => void): Unsubscribe {
-  const q = query(collection(db, MENTORS), orderBy("order", "asc"));
-  return onSnapshot(q, (snap) => cb(snapToArray<Mentor>(snap)));
+  return onSnapshot(collection(db, MENTORS), (snap) => {
+    const items = snapToArray<Mentor>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
 }
 
 export async function addMentor(data: Omit<Mentor, "id">): Promise<string> {
@@ -156,16 +159,19 @@ export async function deleteMentor(id: string): Promise<void> {
 const SOCIAL_MENTORS = "socialMentors";
 
 export async function getSocialMentors(): Promise<SocialMentor[]> {
-  const q = query(collection(db, SOCIAL_MENTORS), orderBy("order", "asc"));
-  const snap = await getDocs(q);
-  return snapToArray<SocialMentor>(snap);
+  const snap = await getDocs(collection(db, SOCIAL_MENTORS));
+  const items = snapToArray<SocialMentor>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function subscribeSocialMentors(
   cb: (mentors: SocialMentor[]) => void
 ): Unsubscribe {
-  const q = query(collection(db, SOCIAL_MENTORS), orderBy("order", "asc"));
-  return onSnapshot(q, (snap) => cb(snapToArray<SocialMentor>(snap)));
+  return onSnapshot(collection(db, SOCIAL_MENTORS), (snap) => {
+    const items = snapToArray<SocialMentor>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
 }
 
 export async function addSocialMentor(
@@ -198,14 +204,17 @@ export async function deleteSocialMentor(id: string): Promise<void> {
 const CAREERS = "careers";
 
 export async function getCareers(): Promise<Career[]> {
-  const q = query(collection(db, CAREERS), orderBy("order", "asc"));
-  const snap = await getDocs(q);
-  return snapToArray<Career>(snap);
+  const snap = await getDocs(collection(db, CAREERS));
+  const items = snapToArray<Career>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function subscribeCareers(cb: (careers: Career[]) => void): Unsubscribe {
-  const q = query(collection(db, CAREERS), orderBy("order", "asc"));
-  return onSnapshot(q, (snap) => cb(snapToArray<Career>(snap)));
+  return onSnapshot(collection(db, CAREERS), (snap) => {
+    const items = snapToArray<Career>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
 }
 
 export async function addCareer(data: Omit<Career, "id">): Promise<string> {
@@ -236,16 +245,19 @@ export async function deleteCareer(id: string): Promise<void> {
 const PARTNERS = "partners";
 
 export async function getPartners(): Promise<Partner[]> {
-  const q = query(collection(db, PARTNERS), orderBy("order", "asc"));
-  const snap = await getDocs(q);
-  return snapToArray<Partner>(snap);
+  const snap = await getDocs(collection(db, PARTNERS));
+  const items = snapToArray<Partner>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function subscribePartners(
   cb: (partners: Partner[]) => void
 ): Unsubscribe {
-  const q = query(collection(db, PARTNERS), orderBy("order", "asc"));
-  return onSnapshot(q, (snap) => cb(snapToArray<Partner>(snap)));
+  return onSnapshot(collection(db, PARTNERS), (snap) => {
+    const items = snapToArray<Partner>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
 }
 
 export async function addPartner(data: Omit<Partner, "id">): Promise<string> {
@@ -276,22 +288,19 @@ export async function deletePartner(id: string): Promise<void> {
 const FEATURED_PARTNERS = "featuredPartners";
 
 export async function getFeaturedPartners(): Promise<FeaturedPartner[]> {
-  const q = query(
-    collection(db, FEATURED_PARTNERS),
-    orderBy("order", "asc")
-  );
-  const snap = await getDocs(q);
-  return snapToArray<FeaturedPartner>(snap);
+  const snap = await getDocs(collection(db, FEATURED_PARTNERS));
+  const items = snapToArray<FeaturedPartner>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
 export function subscribeFeaturedPartners(
   cb: (partners: FeaturedPartner[]) => void
 ): Unsubscribe {
-  const q = query(
-    collection(db, FEATURED_PARTNERS),
-    orderBy("order", "asc")
-  );
-  return onSnapshot(q, (snap) => cb(snapToArray<FeaturedPartner>(snap)));
+  return onSnapshot(collection(db, FEATURED_PARTNERS), (snap) => {
+    const items = snapToArray<FeaturedPartner>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
 }
 
 export async function addFeaturedPartner(
