@@ -32,25 +32,25 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4 relative overflow-hidden select-none">
-      {/* Background ambient gradient */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-sky-200/40 blur-[120px] rounded-full pointer-events-none" />
+    <main className="min-h-screen bg-[#F9F9F9] flex items-center justify-center p-4 relative overflow-hidden select-none">
+      {/* Ambient maroon glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-[#800020]/15 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative w-full max-w-md animate-fade-in space-y-6">
         {/* Card Container */}
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl space-y-6">
+        <div className="bg-white border border-[#EEEEEE] rounded-2xl p-8 shadow-xl space-y-6">
           
           {/* Header */}
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200 text-sky-600 font-black text-lg shadow-xs">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#FFF0F2] border border-[#FECDD3] text-[#800020] font-black text-lg shadow-xs">
               AIC
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+              <h1 className="text-xl font-black text-black tracking-tight">
                 AIC Techno CMS
               </h1>
-              <p className="text-xs text-slate-500 mt-1 flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-sky-600" />
+              <p className="text-xs text-[#555555] font-medium mt-1 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#800020]" />
                 <span>Authorized Administrative Portal</span>
               </p>
             </div>
@@ -61,12 +61,12 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="email"
-                className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                className="block text-xs font-bold text-black uppercase tracking-wider"
               >
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="email"
                   type="email"
@@ -83,12 +83,12 @@ export default function LoginPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="password"
-                className="block text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                className="block text-xs font-bold text-black uppercase tracking-wider"
               >
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#888888] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   id="password"
                   type="password"
@@ -105,7 +105,7 @@ export default function LoginPage() {
             {error && (
               <div
                 role="alert"
-                className="text-xs text-rose-600 bg-rose-50 border border-rose-200 rounded-lg p-3 animate-fade-in"
+                className="text-xs font-semibold text-[#991B1B] bg-[#FEE2E2] border border-[#FECACA] rounded-lg p-3 animate-fade-in"
               >
                 {error}
               </div>
@@ -115,7 +115,7 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="w-full cms-btn-primary py-3 font-semibold text-sm shadow-md shadow-sky-600/20 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full cms-btn-primary py-3 font-bold text-sm shadow-md shadow-[#800020]/20 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -130,8 +130,8 @@ export default function LoginPage() {
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-[11px] text-slate-500 space-y-1">
-          <p className="font-medium text-slate-700">
+        <div className="text-center text-[11px] text-[#666666] space-y-1">
+          <p className="font-bold text-black">
             AIC Techno Innovation and Incubation Council
           </p>
           <p>Supported by Atal Innovation Mission, NITI Aayog</p>

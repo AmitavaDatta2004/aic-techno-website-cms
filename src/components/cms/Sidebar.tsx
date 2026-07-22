@@ -83,32 +83,26 @@ export function Sidebar() {
   return (
     <aside
       id="cms-sidebar"
-      className="fixed top-0 left-0 h-full w-64 flex flex-col z-50 bg-white border-r border-slate-300 shadow-xs select-none"
+      className="fixed top-0 left-0 h-full w-64 flex flex-col z-50 bg-white border-r border-[#EEEEEE] select-none"
     >
-      {/* Brand Header */}
-      <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-sky-600/20">
-            AIC
-          </div>
-          <div>
-            <div className="text-black font-extrabold text-sm tracking-tight leading-none">
-              AIC Techno
-            </div>
-            <div className="text-sky-700 font-bold text-[10px] tracking-wider uppercase mt-1">
-              Enterprise CMS
-            </div>
-          </div>
+      {/* Brand Header — Using Official AIC Website Logo */}
+      <div className="px-5 h-[68px] border-b border-[#EEEEEE] flex items-center justify-between bg-white">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <img
+            src="/logo.jpeg"
+            alt="AIC Techno Logo"
+            className="h-10 w-auto object-contain max-w-[160px]"
+          />
         </div>
 
-        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 ring-4 ring-emerald-100" title="System Online" />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#800020] animate-pulse shrink-0" title="System Online" />
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+      <nav className="flex-1 px-3 py-5 space-y-6 overflow-y-auto">
         {NAV_GROUPS.map((group) => (
           <div key={group.title} className="space-y-1">
-            <div className="px-3 text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">
+            <div className="px-3 text-[10px] font-extrabold text-[#888888] uppercase tracking-[2px] mb-2">
               {group.title}
             </div>
             {group.items.map((item) => {
@@ -119,27 +113,27 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs transition-all duration-150 ${
+                  className={`group relative flex items-center gap-3 px-3 py-2.5 rounded text-xs transition-all duration-200 ${
                     active
-                      ? "bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-300"
-                      : "text-slate-900 font-semibold hover:text-black hover:bg-slate-100 border border-transparent"
+                      ? "bg-gradient-to-r from-[#800020] via-[#73001D] to-[#5B0017] text-white font-bold shadow-md shadow-[#800020]/20 border border-[#800020]"
+                      : "text-[#333333] font-semibold border border-transparent hover:border-[#FECDD3] hover:text-[#800020] hover:bg-gradient-to-r hover:from-[#FFF0F2] hover:via-[#FFE4E6] hover:to-[#FFF0F2] hover:shadow-xs"
                   }`}
                 >
                   <Icon
                     className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                      active ? "text-sky-700" : "text-slate-700 group-hover:text-black"
+                      active ? "text-white" : "text-[#555555] group-hover:text-[#800020]"
                     }`}
                   />
                   <span className="truncate">{item.label}</span>
 
                   {item.badge && !active && (
-                    <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 border border-slate-300">
+                    <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#555555] border border-[#EEEEEE] group-hover:border-[#FECDD3] group-hover:bg-white transition-colors">
                       {item.badge}
                     </span>
                   )}
 
                   {active && (
-                    <span className="ml-auto w-2 h-2 rounded-full bg-sky-600" />
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-xs" />
                   )}
                 </Link>
               );
@@ -149,23 +143,23 @@ export function Sidebar() {
       </nav>
 
       {/* Footer Actions */}
-      <div className="p-3 border-t border-slate-200 bg-slate-100/80 space-y-1">
+      <div className="p-3 border-t border-[#EEEEEE] bg-[#F5F5F5] space-y-1">
         <a
           href="https://aic-techno.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold text-slate-800 hover:text-black hover:bg-slate-200 transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded text-xs font-bold text-[#333333] hover:text-[#800020] hover:bg-gradient-to-r hover:from-[#FFF0F2] hover:to-[#FFE4E6] transition-all"
         >
-          <ExternalLink className="w-4 h-4 text-slate-700" />
+          <ExternalLink className="w-4 h-4 text-[#555555]" />
           <span>View Live Website</span>
         </a>
 
         <button
           id="logout-btn"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold text-slate-800 hover:text-rose-700 hover:bg-rose-100 transition-colors text-left"
+          className="w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-bold text-[#333333] hover:text-red-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 transition-all text-left"
         >
-          <LogOut className="w-4 h-4 text-slate-700 group-hover:text-rose-700" />
+          <LogOut className="w-4 h-4 text-[#555555] group-hover:text-red-700" />
           <span>Sign Out</span>
         </button>
       </div>

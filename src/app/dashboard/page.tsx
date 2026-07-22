@@ -63,41 +63,26 @@ export default function DashboardPage() {
       title: "Ecosystem Enablers",
       value: stats?.mentors,
       icon: Users,
-      color: "text-sky-700",
-      bg: "bg-sky-50",
-      border: "border-sky-300",
     },
     {
       title: "Social Mentors",
       value: stats?.socialMentors,
       icon: HeartHandshake,
-      color: "text-teal-700",
-      bg: "bg-teal-50",
-      border: "border-teal-300",
     },
     {
       title: "Active Jobs",
       value: stats?.activeCareers,
       icon: Briefcase,
-      color: "text-emerald-700",
-      bg: "bg-emerald-50",
-      border: "border-emerald-300",
     },
     {
       title: "Ecosystem Partners",
       value: stats?.partners,
       icon: Building2,
-      color: "text-amber-700",
-      bg: "bg-amber-50",
-      border: "border-amber-300",
     },
     {
       title: "Media Assets",
       value: stats?.mediaFiles,
       icon: ImageIcon,
-      color: "text-blue-700",
-      bg: "bg-blue-50",
-      border: "border-blue-300",
     },
   ];
 
@@ -140,29 +125,29 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
+    <div className="flex flex-col min-h-screen w-full bg-[#F9F9F9]">
       <Topbar title="Overview" />
 
-      {/* Full-width container across the screen */}
+      {/* Full-width container */}
       <main className="flex-1 px-8 py-8 space-y-8 w-full">
-        {/* Full-width Welcome Banner */}
-        <div className="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-xl border border-slate-800 w-full">
+        {/* Welcome Banner — Rich Obsidian & Maroon Gradient */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-black via-[#1F0008] to-[#4D0013] text-white p-8 sm:p-10 shadow-xl border border-[#660019]/40 w-full">
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-200 text-xs font-bold">
-                <Zap className="w-3.5 h-3.5" />
-                Live Firestore Synchronization Enabled
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-extrabold uppercase tracking-widest">
+                <Zap className="w-3.5 h-3.5 text-rose-300" />
+                Live Firestore Sync Active
               </div>
-              <h2 className="text-2xl font-black tracking-tight text-white">
+              <h2 className="text-3xl font-black tracking-tight text-white leading-tight">
                 AIC Techno Innovation & Incubation Council
               </h2>
-              <p className="text-sm text-slate-200 leading-relaxed font-medium">
-                Welcome to the central management system. Updates made to dynamic modules reflect live on{" "}
+              <p className="text-sm text-[#EEEEEE] leading-relaxed font-normal max-w-2xl">
+                Center for Innovation & Entrepreneurship — West Bengal&apos;s first Atal Incubation Centre. Updates made in this CMS reflect live on{" "}
                 <a
                   href="https://aic-techno.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sky-300 font-bold underline underline-offset-4 hover:text-white"
+                  className="text-white font-bold underline underline-offset-4 hover:text-rose-200"
                 >
                   aic-techno.com
                 </a>{" "}
@@ -174,7 +159,7 @@ export default function DashboardPage() {
               href="https://aic-techno.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2.5 rounded-lg font-extrabold text-sm bg-sky-500 text-white hover:bg-sky-400 transition-all shadow-md shrink-0 flex items-center gap-2"
+              className="px-6 py-3 rounded text-white bg-[#800020] hover:bg-[#660019] font-extrabold text-xs tracking-wider uppercase transition-all shadow-md shrink-0 flex items-center gap-2"
             >
               <span>View Production Site</span>
               <ExternalLink className="w-4 h-4" />
@@ -182,38 +167,38 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Metric Cards — Full Width Grid */}
+        {/* Metric Cards — Dynamic Auto-Fit Grid */}
         <div className="w-full">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-black text-black uppercase tracking-widest">
+            <h3 className="text-xs font-black text-black uppercase tracking-[2.5px]">
               Key Content Metrics
             </h3>
-            <span className="flex items-center gap-1.5 text-xs text-emerald-800 font-extrabold">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Realtime Sync Active
+            <span className="flex items-center gap-1.5 text-xs text-[#800020] font-extrabold">
+              <CheckCircle2 className="w-4 h-4 text-[#800020]" /> Realtime Sync Active
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 w-full">
             {statCards.map((card) => {
               const Icon = card.icon;
               return (
                 <div
                   key={card.title}
-                  className="cms-card p-5 flex flex-col justify-between space-y-4 w-full"
+                  className="bg-white border border-[#EEEEEE] rounded-xl p-6 flex flex-col justify-between space-y-4 w-full shadow-xs hover:border-[#800020] transition-colors"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-black">
+                    <span className="text-xs font-extrabold text-[#555555] uppercase tracking-wider">
                       {card.title}
                     </span>
-                    <div className={`p-2 rounded-lg ${card.bg} ${card.border} border`}>
-                      <Icon className={`w-4 h-4 ${card.color}`} />
+                    <div className="p-2 rounded bg-[#FFF0F2] border border-[#FECDD3]">
+                      <Icon className="w-4 h-4 text-[#800020]" />
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-3xl font-black text-black tracking-tight">
+                    <div className="text-4xl font-black text-black tracking-tight leading-none">
                       {loadingStats ? (
-                        <div className="h-8 w-12 rounded bg-slate-200 animate-pulse-soft" />
+                        <div className="h-8 w-12 rounded bg-[#EEEEEE] animate-pulse-soft" />
                       ) : (
                         card.value ?? 0
                       )}
@@ -225,13 +210,13 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Dynamic Modules Grid — Full Width Responsive Grid */}
+        {/* Dynamic Modules Grid */}
         <div className="space-y-4 w-full">
-          <h3 className="text-xs font-black text-black uppercase tracking-widest">
+          <h3 className="text-xs font-black text-black uppercase tracking-[2.5px]">
             Active Management Modules
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 w-full">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5 w-full">
             {quickModules.map((mod) => {
               const Icon = mod.icon;
               return (
@@ -242,25 +227,25 @@ export default function DashboardPage() {
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 group-hover:bg-sky-100 transition-colors">
-                        <Icon className="w-6 h-6 text-sky-700" />
+                      <div className="p-3 rounded bg-[#FFF0F2] border border-[#FECDD3] group-hover:bg-[#800020] group-hover:text-white transition-colors">
+                        <Icon className="w-5 h-5 text-[#800020] group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 border border-sky-300">
+                      <span className="text-[10px] font-extrabold text-[#800020] uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#FFF0F2] border border-[#FECDD3]">
                         {mod.badge}
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="text-base font-extrabold text-black group-hover:text-sky-700 transition-colors">
+                      <h4 className="text-base font-black text-black group-hover:text-[#800020] transition-colors">
                         {mod.label}
                       </h4>
-                      <p className="text-xs text-slate-800 font-medium mt-1 leading-relaxed">
+                      <p className="text-xs text-[#555555] font-medium mt-1 leading-relaxed">
                         {mod.desc}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center text-xs font-bold text-sky-700 group-hover:translate-x-1 transition-transform">
+                  <div className="flex items-center text-xs font-bold text-[#800020] group-hover:translate-x-1 transition-transform">
                     <span>Manage Module</span>
                     <ArrowRight className="w-4 h-4 ml-1.5" />
                   </div>

@@ -233,7 +233,7 @@ export default function MediaLibraryPage() {
               <p className="text-[var(--cms-text-2)]">No media files found. Upload some to get started.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-6 w-full">
               {media.map((file) => (
                 <div key={file.id} className="cms-card group overflow-hidden flex flex-col">
                   <div className="relative aspect-square overflow-hidden bg-[var(--cms-surface-2)]">

@@ -131,7 +131,7 @@ export default function MentorsPage() {
             <p style={{ color: "var(--cms-muted)" }}>No mentors found. Add one to get started.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-6 w-full">
             {mentors.map((mentor) => (
               <div key={mentor.id} id={`mentor-${mentor.id}`} className="cms-card p-6 rounded-xl space-y-4">
                 <div className="flex items-start gap-6">

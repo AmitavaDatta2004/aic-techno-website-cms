@@ -1,34 +1,35 @@
 @import "tailwindcss";
 
-/* ─── AIC Techno CMS Enterprise Light Theme (High-Contrast Solid Black Text) ─ */
+/* ─── AIC Techno CMS — Obsidian & Rich Maroon Design System ───────────────
+   Monochrome obsidian foundation with a rich executive Maroon accent (#800020)
+   ────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Surface Layers */
-  --cms-bg:            #F8FAFC;   /* Slate 50 Canvas */
+  /* Surfaces */
+  --cms-bg:            #F9F9F9;   /* Crisp Off-White */
   --cms-surface:       #FFFFFF;   /* Pure White Card */
-  --cms-surface-2:     #F1F5F9;   /* Input / Sub-surface */
-  --cms-surface-hover: #E2E8F0;   /* Interactive Hover */
-  --cms-border:        #CBD5E1;   /* Slate 300 Sharp Border */
-  --cms-border-focus:  #0284C7;   /* Sky Blue */
+  --cms-surface-2:     #F5F5F5;   /* Sub-surface */
+  --cms-surface-hover: #EEEEEE;   /* Hover State */
+  --cms-border:        #E2E2E2;   /* 1px Border */
+  --cms-border-focus:  #800020;   /* Rich Maroon Focus */
 
-  /* Color Accents */
-  --cms-accent:        #0284C7;   /* Sky Blue 600 */
-  --cms-accent-hover:  #0369A1;   /* Sky Blue 700 */
-  --cms-accent-light:  #E0F2FE;   /* Sky 100 */
-  --cms-success:       #047857;   /* Emerald 700 */
-  --cms-success-light: #D1FAE5;   /* Emerald 100 */
-  --cms-danger:        #B91C1C;   /* Red 700 */
-  --cms-danger-light:  #FEE2E2;   /* Red 100 */
-  --cms-warning:       #B45309;   /* Amber 700 */
-  --cms-info:          #1D4ED8;   /* Blue 700 */
+  /* Color Accents (Rich Maroon & Black) */
+  --cms-accent:        #800020;   /* Executive Deep Maroon */
+  --cms-accent-hover:  #660019;   /* Darker Maroon */
+  --cms-accent-light:  #FFF0F2;   /* Soft Maroon Tint */
+  --cms-success:       #047857;   /* Emerald */
+  --cms-success-light: #D1FAE5;
+  --cms-danger:        #991B1B;   /* Deep Red */
+  --cms-danger-light:  #FEE2E2;
+  --cms-warning:       #B45309;
 
-  /* Text Hierarchy (Full Solid Black & Crisp High Contrast) */
-  --cms-text:          #000000;   /* Full Solid Black for Headings & Titles */
-  --cms-text-2:        #111827;   /* Near Black (Gray 900) for Secondary Text */
-  --cms-muted:         #334155;   /* Slate 700 for Captions & Descriptions */
+  /* Text Hierarchy */
+  --cms-text:          #000000;   /* Solid Black Headings */
+  --cms-text-2:        #1A1A1A;   /* Near-Black Text */
+  --cms-muted:         #555555;   /* Gray 500 Captions */
 
-  /* Typography */
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Font */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 @theme inline {
@@ -47,7 +48,7 @@
   --font-sans:               var(--font-sans);
 }
 
-/* ─── Global Reset & Scrollbars ──────────────────────────────────────────── */
+/* ─── Base Reset ─────────────────────────────────────────────────────────── */
 
 *,
 *::before,
@@ -57,6 +58,7 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -69,134 +71,130 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--cms-bg);
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
-  background: #94A3B8;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #64748B;
+  background: #800020;
+  border-radius: 2px;
 }
 
-/* ─── Component Utilities ────────────────────────────────────────────────── */
+/* ─── Components ─────────────────────────────────────────────────────────── */
 
 .cms-card {
-  background: var(--cms-surface);
-  border: 1px solid var(--cms-border);
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
   border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 }
 
 .cms-card-interactive {
-  background: var(--cms-surface);
-  border: 1px solid var(--cms-border);
+  background: #FFFFFF;
+  border: 1px solid #EEEEEE;
   border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 }
 .cms-card-interactive:hover {
-  border-color: #0284C7;
-  background: #FFFFFF;
+  border-color: #800020;
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.15);
+  box-shadow: 0 8px 24px rgba(128, 0, 32, 0.12);
 }
 
 .cms-input {
   background: #FFFFFF;
-  border: 1px solid var(--cms-border);
-  border-radius: 8px;
+  border: 1px solid #CCCCCC;
+  border-radius: 6px;
   color: #000000;
   font-weight: 500;
   padding: 10px 14px;
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
   transition: all 0.15s ease;
   width: 100%;
 }
 .cms-input:focus {
-  border-color: var(--cms-accent);
-  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+  border-color: #800020;
+  box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.15);
 }
 .cms-input::placeholder {
-  color: #64748B;
-  font-weight: 400;
+  color: #888888;
 }
 
+/* Primary Button — Deep Maroon */
 .cms-btn-primary {
-  background: var(--cms-accent);
-  color: #ffffff;
+  background: #800020;
+  color: #FFFFFF;
   font-weight: 700;
-  font-size: 14px;
-  padding: 9px 18px;
-  border-radius: 8px;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 6px;
   border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
+  letter-spacing: 0.2px;
 }
 .cms-btn-primary:hover {
-  background: var(--cms-accent-hover);
+  background: #660019;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
-}
-.cms-btn-primary:active {
-  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(128, 0, 32, 0.3);
 }
 
 .cms-btn-secondary {
   background: #FFFFFF;
   color: #000000;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 9px 18px;
-  border-radius: 8px;
-  border: 1px solid var(--cms-border);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  border: 1px solid #000000;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
 }
 .cms-btn-secondary:hover {
-  background: var(--cms-surface-2);
-  border-color: #94A3B8;
+  background: #FFF0F2;
+  border-color: #800020;
+  color: #800020;
 }
 
 .cms-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
-  border-radius: 9999px;
+  padding: 4px 12px;
+  border-radius: 100px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 .cms-badge-sky {
-  background: var(--cms-accent-light);
-  color: #0284C7;
-  border: 1px solid #7DD3FC;
+  background: #FFF0F2;
+  color: #800020;
+  border: 1px solid #FECDD3;
 }
 .cms-badge-emerald {
-  background: var(--cms-success-light);
-  color: #047857;
-  border: 1px solid #6EE7B7;
+  background: #F5F5F5;
+  color: #000000;
+  border: 1px solid #CCCCCC;
 }
 .cms-badge-rose {
-  background: var(--cms-danger-light);
-  color: #B91C1C;
-  border: 1px solid #FCA5A5;
+  background: #FFF0F0;
+  color: #991B1B;
+  border: 1px solid #FFCCCC;
 }
 
 /* ─── Keyframe Animations ─────────────────────────────────────────────── */
@@ -206,16 +204,4 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes pulseSoft {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
-}
-
-.animate-fade-in    { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-slide-in   { animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-pulse-soft { animation: pulseSoft 2s ease-in-out infinite; }
+.animate-fade-in { animation: fadeIn 0.25s ease both; }

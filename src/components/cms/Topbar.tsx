@@ -24,47 +24,57 @@ export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
   return (
     <header
       id="cms-topbar"
-      className="flex items-center justify-between px-8 py-4 sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-300 shadow-xs"
+      className="flex items-center justify-between px-8 h-[68px] sticky top-0 z-40 bg-white border-b border-[#EEEEEE] shadow-xs"
     >
-      {/* Left: Title & Breadcrumbs */}
-      <div>
-        <nav className="flex items-center gap-1.5 text-xs text-slate-700 font-bold mb-1">
-          <span>Dashboard</span>
-          {breadcrumb && (
-            <>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-              <span className="text-black font-extrabold">{breadcrumb}</span>
-            </>
-          )}
-        </nav>
-        <h1 className="text-xl font-extrabold tracking-tight text-black flex items-center gap-2">
-          {title}
-        </h1>
+      {/* Left: Official AIC Logo + Title & Breadcrumbs */}
+      <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center border-r border-[#EEEEEE] pr-4 py-1">
+          <img
+            src="/logo.jpeg"
+            alt="AIC Techno Logo"
+            className="h-9 w-auto object-contain"
+          />
+        </div>
+
+        <div>
+          <nav className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#888888] mb-0.5">
+            <span>Dashboard</span>
+            {breadcrumb && (
+              <>
+                <ChevronRight className="w-3 h-3 text-[#CCCCCC]" />
+                <span className="text-[#800020]">{breadcrumb}</span>
+              </>
+            )}
+          </nav>
+          <h1 className="text-xl font-black tracking-tight text-black flex items-center gap-2">
+            {title}
+          </h1>
+        </div>
       </div>
 
       {/* Right: Actions & User Info */}
       <div className="flex items-center gap-4">
         {actions}
 
-        <div className="h-6 w-[1px] bg-slate-300 hidden sm:block" />
+        <div className="h-6 w-[1px] bg-[#EEEEEE] hidden sm:block" />
 
         {/* User Pill */}
-        <div className="flex items-center gap-3 bg-slate-100 border border-slate-300 px-3.5 py-1.5 rounded-full shadow-xs">
-          <div className="w-7 h-7 rounded-full bg-sky-700 flex items-center justify-center text-white font-black text-xs shadow-inner">
+        <div className="flex items-center gap-3 bg-[#FFF0F2] border border-[#FECDD3] px-3.5 py-1.5 rounded-full shadow-xs">
+          <div className="w-7 h-7 rounded-full bg-[#800020] flex items-center justify-center text-white font-black text-xs shadow-sm">
             {initials || "A"}
           </div>
           <div className="text-left hidden sm:block pr-1">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-black leading-tight">
+              <span className="text-xs font-extrabold text-black leading-tight">
                 {displayName}
               </span>
               {isAdmin && (
                 <span title="Admin User">
-                  <ShieldCheck className="w-3.5 h-3.5 text-sky-700" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#800020]" />
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-slate-800 font-medium block leading-tight truncate max-w-[150px]">
+            <span className="text-[10px] text-[#555555] font-semibold block leading-tight truncate max-w-[150px]">
               {user?.email}
             </span>
           </div>
