@@ -13,11 +13,15 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: "◈" },
+  { href: "/dashboard/hero", label: "Hero Section", icon: "🏠" },
+  { href: "/dashboard/about", label: "About", icon: "ℹ️" },
   { href: "/dashboard/mentors", label: "Ecosystem Enablers", icon: "🧑‍🤝‍🧑" },
   { href: "/dashboard/social-mentors", label: "Social Mentors", icon: "👥" },
   { href: "/dashboard/careers", label: "Careers", icon: "💼" },
   { href: "/dashboard/partners", label: "Partners", icon: "🤝" },
+  { href: "/dashboard/back2bengal", label: "Back2Bengal", icon: "🐅" },
   { href: "/dashboard/media", label: "Media Library", icon: "🖼️" },
+  { href: "/dashboard/settings", label: "Site Settings", icon: "⚙️" },
 ];
 
 export function Sidebar() {

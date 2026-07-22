@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   getDocs,
@@ -12,7 +13,6 @@ import {
   onSnapshot,
   query,
   orderBy,
-  where,
   serverTimestamp,
   Timestamp,
   type DocumentData,
@@ -348,4 +348,168 @@ export async function addMediaRecord(
 
 export async function deleteMediaRecord(id: string): Promise<void> {
   await deleteDoc(doc(db, MEDIA, id));
+}
+
+// ─── Site Content (single-document sections) ──────────────────────────────────
+
+const SITE_CONTENT = "siteContent";
+
+// -- Hero --
+
+export interface HeroContent {
+  title: string;
+  subtitle: string;
+  badgeText: string;
+  cta1Text: string;
+  cta1Link: string;
+  cta2Text: string;
+  cta2Link: string;
+  aimTag1: string;
+  aimTag2: string;
+  updatedAt?: Timestamp;
+}
+
+export async function getHeroContent(): Promise<HeroContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "hero"));
+  return snap.exists() ? (snap.data() as HeroContent) : null;
+}
+
+export async function saveHeroContent(data: Omit<HeroContent, "updatedAt">): Promise<void> {
+  await setDoc(doc(db, SITE_CONTENT, "hero"), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+// -- About TIG --
+
+export interface TIGStat {
+  value: string;
+  label: string;
+}
+
+export interface AboutTIGContent {
+  sectionTag: string;
+  title: string;
+  subtitle: string;
+  stats: TIGStat[];
+  foundedYear: string;
+  foundedLabel: string;
+  description1: string;
+  description2: string;
+  updatedAt?: Timestamp;
+}
+
+export async function getAboutTIGContent(): Promise<AboutTIGContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "aboutTIG"));
+  return snap.exists() ? (snap.data() as AboutTIGContent) : null;
+}
+
+export async function saveAboutTIGContent(data: Omit<AboutTIGContent, "updatedAt">): Promise<void> {
+  await setDoc(doc(db, SITE_CONTENT, "aboutTIG"), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+// -- About AIC --
+
+export interface AICCard {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface AboutAICContent {
+  sectionTag: string;
+  heading: string;
+  subtitle: string;
+  cards: AICCard[];
+  updatedAt?: Timestamp;
+}
+
+export async function getAboutAICContent(): Promise<AboutAICContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "aboutAIC"));
+  return snap.exists() ? (snap.data() as AboutAICContent) : null;
+}
+
+export async function saveAboutAICContent(data: Omit<AboutAICContent, "updatedAt">): Promise<void> {
+  await setDoc(doc(db, SITE_CONTENT, "aboutAIC"), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+// -- Site Settings --
+
+export interface NavLink {
+  text: string;
+  href: string;
+}
+
+export interface SocialLink {
+  platform: string;
+  url: string;
+  icon: string;
+}
+
+export interface FooterLink {
+  text: string;
+  href: string;
+}
+
+export interface SiteSettings {
+  logoUrl: string;
+  logoAlt: string;
+  navLinks: NavLink[];
+  footerBrandSubtitle: string;
+  footerAimLine: string;
+  contactEmail: string;
+  footerNavLinks: FooterLink[];
+  footerExternalLinks: FooterLink[];
+  socialLinks: SocialLink[];
+  copyrightText: string;
+  updatedAt?: Timestamp;
+}
+
+export async function getSiteSettings(): Promise<SiteSettings | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "settings"));
+  return snap.exists() ? (snap.data() as SiteSettings) : null;
+}
+
+export async function saveSiteSettings(data: Omit<SiteSettings, "updatedAt">): Promise<void> {
+  await setDoc(doc(db, SITE_CONTENT, "settings"), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+// -- Back2Bengal --
+
+export interface B2BCard {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface Back2BengalContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  heroBadge: string;
+  heroDescription: string;
+  sections: { title: string; body: string }[];
+  cards: B2BCard[];
+  updatedAt?: Timestamp;
+}
+
+export async function getBack2BengalContent(): Promise<Back2BengalContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "back2bengal"));
+  return snap.exists() ? (snap.data() as Back2BengalContent) : null;
+}
+
+export async function saveBack2BengalContent(data: Omit<Back2BengalContent, "updatedAt">): Promise<void> {
+  await setDoc(doc(db, SITE_CONTENT, "back2bengal"), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
 }

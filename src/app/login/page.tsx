@@ -3,7 +3,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+
 import { signIn } from "@/lib/auth";
 
 export default function LoginPage() {
