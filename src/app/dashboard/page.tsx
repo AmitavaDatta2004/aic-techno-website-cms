@@ -93,35 +93,30 @@ export default function DashboardPage() {
       label: "Ecosystem Enablers",
       desc: "Manage domain leads, serial founders & key incubation mentors",
       icon: Users,
-      badge: "Dynamic Firestore",
     },
     {
       href: "/dashboard/social-mentors",
       label: "Social Mentors",
       desc: "Manage extended network mentors for Social Innovation vertical",
       icon: HeartHandshake,
-      badge: "Dynamic Firestore",
     },
     {
       href: "/dashboard/careers",
       label: "Careers & Recruitment",
       desc: "Publish job postings, role descriptions and application URLs",
       icon: Briefcase,
-      badge: "Dynamic Firestore",
     },
     {
       href: "/dashboard/partners",
       label: "Partners & Supporters",
       desc: "Government, Institutional, Fab Lab & Cloud program partners",
       icon: Building2,
-      badge: "Dynamic Firestore",
     },
     {
       href: "/dashboard/media",
       label: "Media & Asset Storage",
       desc: "Upload image files directly to Firebase Storage bucket",
       icon: ImageIcon,
-      badge: "Firebase Storage",
     },
   ];
 
@@ -232,9 +227,6 @@ export default function DashboardPage() {
                       <div className="p-3 rounded-xl bg-[#FFF0F3] border border-[#FECDD3] group-hover:bg-[#800020] group-hover:text-white transition-all shadow-xs">
                         <Icon className="w-5 h-5 text-[#800020] group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-[10px] font-extrabold text-[#800020] uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#FFF0F3] border border-[#FECDD3]">
-                        {mod.badge}
-                      </span>
                     </div>
 
                     <div>

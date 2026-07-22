@@ -7,7 +7,7 @@ import { signOut } from "@/lib/auth";
 import sidebarLogo from "../../../public/sidebar-logo.png";
 import {
   LayoutDashboard,
-  Sparkles,
+  Monitor,
   Info,
   Users,
   HeartHandshake,
@@ -52,7 +52,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "STATIC SECTIONS",
     items: [
-      { href: "/dashboard/hero", label: "Hero Section", icon: Sparkles },
+      { href: "/dashboard/hero", label: "Hero Section", icon: Monitor },
       { href: "/dashboard/about", label: "About Section", icon: Info },
       { href: "/dashboard/back2bengal", label: "Back2Bengal", icon: Compass },
     ],
