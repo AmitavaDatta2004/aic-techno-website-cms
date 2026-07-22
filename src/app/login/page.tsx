@@ -5,7 +5,8 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { Lock, Mail, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
-import sidebarLogo from "../../../public/sidebar-logo.png";
+// import sidebarLogo from "../../../public/sidebar-logo.png";
+import Logo from "../../../public/logo.jpeg";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function LoginPage() {
         <div className="relative z-10">
           <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl p-3 inline-flex backdrop-blur-md">
             <img
-              src={sidebarLogo.src}
+              src={Logo.src}
               alt="AIC Logo"
               className="h-9 w-auto rounded-md object-contain bg-white p-1"
             />
@@ -121,7 +122,7 @@ export default function LoginPage() {
             <div className="inline-flex justify-center">
               <div className="bg-white border border-[#EEEEEE] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
                 <img
-                  src={sidebarLogo.src}
+                  src={Logo.src}
                   alt="AIC Techno Logo"
                   className="h-14 w-auto object-contain max-w-[200px]"
                 />
