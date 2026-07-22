@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth";
+import sidebarLogo from "../../../public/sidebar-logo.png";
 import {
   LayoutDashboard,
   Sparkles,
@@ -89,7 +90,7 @@ export function Sidebar() {
       <div className="px-5 h-[76px] border-b border-[#EEEEEE] flex items-center justify-between bg-white">
         <div className="flex items-center gap-3 min-w-0">
           <img
-            src="/sidebar-logo.png"
+            src={sidebarLogo.src}
             alt="AIC Techno Logo"
             className="h-10 w-auto object-contain shrink-0 max-w-[90px]"
           />

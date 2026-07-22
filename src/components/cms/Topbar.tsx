@@ -3,6 +3,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { ChevronRight, ShieldCheck } from "lucide-react";
+import logoJpeg from "../../../public/logo.jpeg";
 
 interface TopbarProps {
   title: string;
@@ -49,7 +50,7 @@ export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
         {/* Official logo.jpeg website header logo placed to the left of user pill */}
         <div className="flex items-center px-2 py-1">
           <img
-            src="/logo.jpeg"
+            src={logoJpeg.src}
             alt="AIC Techno Logo"
             className="h-12 md:h-14 w-auto object-contain max-h-14 transition-transform hover:scale-105"
           />

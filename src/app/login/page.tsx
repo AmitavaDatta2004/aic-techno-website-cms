@@ -4,8 +4,8 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth";
-import { Lock, Mail, ShieldCheck, Loader2, ArrowRight } from "lucide-react";
-import Image from "next/image";
+import { Lock, Mail, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import sidebarLogo from "../../../public/sidebar-logo.png";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,8 +13,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Focus states for input animations
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
@@ -69,18 +67,15 @@ export default function LoginPage() {
 
         {/* Top Branding Section */}
         <div className="relative z-10">
-          <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3 inline-flex backdrop-blur-md">
-            <Image
-              src="/logo.jpeg"
+          <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl p-3 inline-flex backdrop-blur-md">
+            <img
+              src={sidebarLogo.src}
               alt="AIC Logo"
-              width={36}
-              height={36}
               className="h-9 w-auto rounded-md object-contain bg-white p-1"
-              priority
             />
             <div className="text-left">
               <div className="text-white font-bold text-xs leading-tight">AIC Techno</div>
-              <div className="text-white/60 text-[10px] leading-tight">incubation console</div>
+              <div className="text-white/70 text-[10px] leading-tight">incubation console</div>
             </div>
           </div>
         </div>
@@ -110,21 +105,14 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Left Footer */}
-        <div className="relative z-10 space-y-3">
-          <div className="h-[1px] w-12 bg-white/20" />
-          <div>
-            <p className="text-white/40 text-[9px] font-bold tracking-widest uppercase">
-              Atal Innovation Mission · NITI Aayog
-            </p>
-            <p className="text-white/25 text-[9px]">
-              Govt. of India Initiative
-            </p>
-          </div>
+        {/* Bottom Attribution */}
+        <div className="relative z-10 text-[11px] text-white/40 space-y-0.5">
+          <div className="font-semibold text-white/60">ATAL INNOVATION MISSION - NITI AAYOG</div>
+          <div>Govt. of India Initiative</div>
         </div>
       </div>
 
-      {/* Right side — login form */}
+      {/* Right side — login form area */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 relative">
         <div className="w-full max-w-md space-y-8 animate-fade-in">
           
@@ -132,13 +120,10 @@ export default function LoginPage() {
           <div className="text-center space-y-4">
             <div className="inline-flex justify-center">
               <div className="bg-white border border-[#EEEEEE] rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
-                <Image
-                  src="/logo.jpeg"
+                <img
+                  src={sidebarLogo.src}
                   alt="AIC Techno Logo"
-                  width={160}
-                  height={56}
                   className="h-14 w-auto object-contain max-w-[200px]"
-                  priority
                 />
               </div>
             </div>
@@ -154,9 +139,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form Card */}
-          <div
-            className="bg-white rounded-2xl p-8 shadow-xl shadow-black/[0.02] border border-[#EEEEEE] space-y-6"
-          >
+          <div className="bg-white rounded-2xl p-8 shadow-xl shadow-black/[0.02] border border-[#EEEEEE] space-y-6">
             <form onSubmit={handleSubmit} className="space-y-5">
               
               {/* Email Address */}
@@ -187,12 +170,11 @@ export default function LoginPage() {
                     autoComplete="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setEmailFocused(true)}
                     onBlur={() => setEmailFocused(false)}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="admin@aic-techno.com"
-                    className="w-full bg-transparent border-0 outline-none text-black font-semibold text-xs py-3.5 pr-4"
-                    style={{ paddingLeft: "42px" }}
+                    className="w-full pl-10 pr-4 py-3 bg-transparent text-xs font-semibold text-[#1A1A1A] placeholder-[#999999] outline-none"
                   />
                 </div>
               </div>
@@ -225,23 +207,23 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setPasswordFocused(true)}
                     onBlur={() => setPasswordFocused(false)}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-transparent border-0 outline-none text-black font-semibold text-xs py-3.5 pr-4"
-                    style={{ paddingLeft: "42px" }}
+                    className="w-full pl-10 pr-4 py-3 bg-transparent text-xs font-semibold text-[#1A1A1A] placeholder-[#999999] outline-none"
                   />
                 </div>
               </div>
 
-              {/* Error messages */}
+              {/* Error Message Alert */}
               {error && (
                 <div
                   role="alert"
-                  className="text-xs font-semibold text-[#991B1B] bg-[#FEE2E2] border border-[#FECACA] rounded-lg p-3.5 animate-fade-in"
+                  className="text-xs font-semibold text-[#991B1B] bg-[#FEE2E2] border border-[#FECACA] rounded-xl p-3.5 flex items-start gap-2.5 animate-fade-in"
                 >
-                  {error}
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#991B1B] shrink-0 mt-1.5" />
+                  <span className="leading-relaxed">{error}</span>
                 </div>
               )}
 
@@ -250,54 +232,37 @@ export default function LoginPage() {
                 id="login-submit"
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 rounded-lg text-white font-bold text-xs tracking-wider uppercase transition-all duration-150 shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background: "linear-gradient(135deg, #800020 0%, #660019 100%)",
-                  boxShadow: "0 4px 14px rgba(128, 0, 32, 0.2)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(128, 0, 32, 0.3)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 14px rgba(128, 0, 32, 0.2)";
-                }}
+                className="w-full py-3.5 px-4 rounded-xl text-white font-extrabold text-xs tracking-wider uppercase bg-[#800020] hover:bg-[#660019] active:scale-[0.99] transition-all duration-150 shadow-md shadow-[#800020]/20 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                    <span>AUTHENTICATING...</span>
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    <span>Authenticating…</span>
                   </>
                 ) : (
                   <>
                     <span>Sign In to Dashboard</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4 text-white/80 group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
               </button>
             </form>
 
-            {/* Security Warning Box */}
-            <div
-              className="flex items-start gap-3 p-3.5 rounded-lg border border-[#F0F0F0]"
-              style={{ background: "#FDFDFD" }}
-            >
-              <ShieldCheck className="w-4 h-4 text-[#800020] flex-shrink-0 mt-0.5" />
-              <p className="text-[10px] text-[#666666] leading-relaxed">
-                Security notice: Access is monitored. Unauthorized attempts will be logged 
-                and may result in account lockout.
+            <div className="p-3 bg-[#FAFAFA] border border-[#EEEEEE] rounded-xl flex items-start gap-3">
+              <ShieldCheck className="w-4 h-4 text-[#800020] shrink-0 mt-0.5" />
+              <p className="text-[11px] text-[#666666] leading-relaxed">
+                Security notice: Access is monitored. Unauthorized attempts will be logged and may result in account lockout.
               </p>
             </div>
           </div>
 
-          {/* Footer branding */}
-          <div className="text-center space-y-1 text-[#888888]">
-            <p className="text-[11px] font-bold text-black">
+          {/* Footer Info */}
+          <div className="text-center text-[11px] text-[#888888] space-y-1">
+            <p className="font-bold text-[#1A1A1A]">
               AIC Techno Innovation and Incubation Council
             </p>
-            <p className="text-[9px] leading-relaxed">
-              Center for Innovation &amp; Entrepreneurship · A Techno India University Initiative
+            <p className="text-[10px]">
+              Center for Innovation & Entrepreneurship · A Techno India University Initiative
             </p>
           </div>
         </div>
