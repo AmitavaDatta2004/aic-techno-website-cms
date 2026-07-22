@@ -85,17 +85,25 @@ export function Sidebar() {
       id="cms-sidebar"
       className="fixed top-0 left-0 h-full w-64 flex flex-col z-50 bg-white border-r border-[#EEEEEE] select-none"
     >
-      {/* Brand Header — Using Official AIC Website Logo */}
-      <div className="px-5 h-[68px] border-b border-[#EEEEEE] flex items-center justify-between bg-white">
-        <div className="flex items-center gap-2.5 min-w-0">
+      {/* Brand Header — Logo + Organization Name & Title */}
+      <div className="px-5 h-[76px] border-b border-[#EEEEEE] flex items-center justify-between bg-white">
+        <div className="flex items-center gap-3 min-w-0">
           <img
-            src="/logo.jpeg"
+            src="/sidebar-logo.png"
             alt="AIC Techno Logo"
-            className="h-10 w-auto object-contain max-w-[160px]"
+            className="h-10 w-auto object-contain shrink-0 max-w-[90px]"
           />
+          <div className="min-w-0">
+            <div className="text-black font-extrabold text-xs tracking-tight uppercase leading-none truncate">
+              AIC Techno
+            </div>
+            <div className="text-[#800020] font-bold text-[9px] tracking-widest uppercase mt-1 truncate">
+              Enterprise CMS
+            </div>
+          </div>
         </div>
 
-        <span className="w-2.5 h-2.5 rounded-full bg-[#800020] animate-pulse shrink-0" title="System Online" />
+        <span className="w-2.5 h-2.5 rounded-full bg-[#800020] animate-pulse shrink-0 ml-1" title="System Online" />
       </div>
 
       {/* Navigation Menu */}
