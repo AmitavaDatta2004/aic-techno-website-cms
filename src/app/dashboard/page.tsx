@@ -138,10 +138,6 @@ export default function DashboardPage() {
           
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div className="space-y-3.5">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-extrabold uppercase tracking-widest backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-rose-300 animate-pulse-glow" />
-                Live Firestore Synchronization Enabled
-              </div>
               <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
                 AIC Techno Innovation & Incubation Council
               </h2>
