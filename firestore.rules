@@ -1,0 +1,78 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ──────────────────────────────────────────────
+    
+    // Check if the request is from an authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the authenticated user has the admin custom claim
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // ─── Site Content (single documents) ───────────────────────────────
+    // Documents: hero, aboutTIG, aboutAIC, settings, back2bengal
+    // Public read (static site fetches this), admin-only write
+    
+    match /siteContent/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Mentors ───────────────────────────────────────────────────────
+    // Public read (displayed on static site), admin-only write
+    
+    match /mentors/{mentorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Social Mentors ────────────────────────────────────────────────
+    // Public read, admin-only write
+    
+    match /socialMentors/{mentorId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Careers ───────────────────────────────────────────────────────
+    // Public read, admin-only write
+    
+    match /careers/{careerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Partners ──────────────────────────────────────────────────────
+    // Public read, admin-only write
+    
+    match /partners/{partnerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Featured Partners ─────────────────────────────────────────────
+    // Public read, admin-only write
+    
+    match /featuredPartners/{partnerId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Media ─────────────────────────────────────────────────────────
+    // Public read (images referenced on static site), admin-only write
+    
+    match /media/{fileId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── Deny everything else ──────────────────────────────────────────
+    // Any collection not explicitly listed above is denied by default
+  }
+}
