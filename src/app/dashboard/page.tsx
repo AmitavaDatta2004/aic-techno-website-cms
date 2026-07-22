@@ -4,11 +4,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Topbar } from "@/components/cms/Topbar";
-import { getMentors } from "@/lib/firestore";
-import { getSocialMentors } from "@/lib/firestore";
-import { getCareers } from "@/lib/firestore";
-import { getPartners, getFeaturedPartners } from "@/lib/firestore";
-import { getMediaFiles } from "@/lib/firestore";
+import { getMentors, getSocialMentors, getCareers, getPartners, getFeaturedPartners, getMediaFiles } from "@/lib/firestore";
+import {
+  Users,
+  HeartHandshake,
+  Briefcase,
+  Building2,
+  Image as ImageIcon,
+  ArrowRight,
+  ExternalLink,
+  Zap,
+  CheckCircle2,
+} from "lucide-react";
 
 interface Stats {
   mentors: number;
@@ -17,52 +24,6 @@ interface Stats {
   partners: number;
   mediaFiles: number;
 }
-
-interface QuickLink {
-  href: string;
-  icon: string;
-  label: string;
-  description: string;
-  accent: string;
-}
-
-const QUICK_LINKS: QuickLink[] = [
-  {
-    href: "/dashboard/mentors",
-    icon: "🧑‍🤝‍🧑",
-    label: "Ecosystem Enablers",
-    description: "Manage mentors, advisors and vertical heads",
-    accent: "#6366F1",
-  },
-  {
-    href: "/dashboard/social-mentors",
-    icon: "👥",
-    label: "Social Mentors",
-    description: "Social Innovation vertical mentor list",
-    accent: "#8B5CF6",
-  },
-  {
-    href: "/dashboard/careers",
-    icon: "💼",
-    label: "Careers",
-    description: "Add, edit or toggle job listings",
-    accent: "#10B981",
-  },
-  {
-    href: "/dashboard/partners",
-    icon: "🤝",
-    label: "Partners",
-    description: "Government, institutional & featured partners",
-    accent: "#F59E0B",
-  },
-  {
-    href: "/dashboard/media",
-    icon: "🖼️",
-    label: "Media Library",
-    description: "Upload and manage images for the site",
-    accent: "#EF4444",
-  },
-];
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -89,7 +50,6 @@ export default function DashboardPage() {
           mediaFiles: media.length,
         });
       } catch {
-        // Stats are non-critical; fail silently
         setStats({ mentors: 0, socialMentors: 0, activeCareers: 0, partners: 0, mediaFiles: 0 });
       } finally {
         setLoadingStats(false);
@@ -98,160 +58,216 @@ export default function DashboardPage() {
     loadStats();
   }, []);
 
+  const statCards = [
+    {
+      title: "Ecosystem Enablers",
+      value: stats?.mentors,
+      icon: Users,
+      color: "text-sky-700",
+      bg: "bg-sky-50",
+      border: "border-sky-300",
+    },
+    {
+      title: "Social Mentors",
+      value: stats?.socialMentors,
+      icon: HeartHandshake,
+      color: "text-teal-700",
+      bg: "bg-teal-50",
+      border: "border-teal-300",
+    },
+    {
+      title: "Active Jobs",
+      value: stats?.activeCareers,
+      icon: Briefcase,
+      color: "text-emerald-700",
+      bg: "bg-emerald-50",
+      border: "border-emerald-300",
+    },
+    {
+      title: "Ecosystem Partners",
+      value: stats?.partners,
+      icon: Building2,
+      color: "text-amber-700",
+      bg: "bg-amber-50",
+      border: "border-amber-300",
+    },
+    {
+      title: "Media Assets",
+      value: stats?.mediaFiles,
+      icon: ImageIcon,
+      color: "text-blue-700",
+      bg: "bg-blue-50",
+      border: "border-blue-300",
+    },
+  ];
+
+  const quickModules = [
+    {
+      href: "/dashboard/mentors",
+      label: "Ecosystem Enablers",
+      desc: "Manage domain leads, serial founders & key incubation mentors",
+      icon: Users,
+      badge: "Dynamic Firestore",
+    },
+    {
+      href: "/dashboard/social-mentors",
+      label: "Social Mentors",
+      desc: "Manage extended network mentors for Social Innovation vertical",
+      icon: HeartHandshake,
+      badge: "Dynamic Firestore",
+    },
+    {
+      href: "/dashboard/careers",
+      label: "Careers & Recruitment",
+      desc: "Publish job postings, role descriptions and application URLs",
+      icon: Briefcase,
+      badge: "Dynamic Firestore",
+    },
+    {
+      href: "/dashboard/partners",
+      label: "Partners & Supporters",
+      desc: "Government, Institutional, Fab Lab & Cloud program partners",
+      icon: Building2,
+      badge: "Dynamic Firestore",
+    },
+    {
+      href: "/dashboard/media",
+      label: "Media & Asset Storage",
+      desc: "Upload image files directly to Firebase Storage bucket",
+      icon: ImageIcon,
+      badge: "Firebase Storage",
+    },
+  ];
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Topbar title="Dashboard" />
+    <div className="flex flex-col min-h-screen w-full">
+      <Topbar title="Overview" />
 
-      <main className="flex-1 px-8 py-8 space-y-8">
-
-        {/* Welcome banner */}
-        <div
-          className="rounded-2xl p-6 flex items-center justify-between gap-4"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(99,102,241,0.05) 100%)",
-            border: "1px solid rgba(99,102,241,0.2)",
-          }}
-        >
-          <div>
-            <h2 className="text-lg font-bold text-cms-text">
-              Welcome to AIC Techno CMS
-            </h2>
-            <p className="text-sm mt-1" style={{ color: "var(--cms-text-2)" }}>
-              Manage your website content. Changes reflect live on{" "}
-              <a
-                href="https://aic-techno.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold underline underline-offset-2"
-                style={{ color: "var(--cms-accent)" }}
-              >
-                aic-techno.com
-              </a>
-              .
-            </p>
-          </div>
-          <a
-            href="https://aic-techno.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            id="view-live-site-btn"
-            className="flex-shrink-0 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-150 hover:-translate-y-0.5"
-            style={{ background: "var(--cms-accent)" }}
-          >
-            View Live Site ↗
-          </a>
-        </div>
-
-        {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {[
-            { label: "Ecosystem Enablers", value: stats?.mentors, icon: "🧑‍🤝‍🧑" },
-            { label: "Social Mentors", value: stats?.socialMentors, icon: "👥" },
-            { label: "Active Jobs", value: stats?.activeCareers, icon: "💼" },
-            { label: "Partners", value: stats?.partners, icon: "🤝" },
-            { label: "Media Files", value: stats?.mediaFiles, icon: "🖼️" },
-          ].map(({ label, value, icon }) => (
-            <div key={label} className="cms-card p-5 rounded-xl">
-              <div className="text-2xl mb-3">{icon}</div>
-              <div
-                className="text-2xl font-black tracking-tight"
-                style={{ color: "var(--cms-text)" }}
-              >
-                {loadingStats ? (
-                  <span
-                    className="inline-block w-8 h-6 rounded animate-pulse-soft"
-                    style={{ background: "var(--cms-surface-2)" }}
-                  />
-                ) : (
-                  value ?? 0
-                )}
+      {/* Full-width container across the screen */}
+      <main className="flex-1 px-8 py-8 space-y-8 w-full">
+        {/* Full-width Welcome Banner */}
+        <div className="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 sm:p-8 shadow-xl border border-slate-800 w-full">
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-200 text-xs font-bold">
+                <Zap className="w-3.5 h-3.5" />
+                Live Firestore Synchronization Enabled
               </div>
-              <div
-                className="text-xs font-medium mt-1"
-                style={{ color: "var(--cms-muted)" }}
-              >
-                {label}
-              </div>
+              <h2 className="text-2xl font-black tracking-tight text-white">
+                AIC Techno Innovation & Incubation Council
+              </h2>
+              <p className="text-sm text-slate-200 leading-relaxed font-medium">
+                Welcome to the central management system. Updates made to dynamic modules reflect live on{" "}
+                <a
+                  href="https://aic-techno.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sky-300 font-bold underline underline-offset-4 hover:text-white"
+                >
+                  aic-techno.com
+                </a>{" "}
+                without rebuilds.
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Quick links */}
-        <div>
-          <h2
-            className="text-xs font-bold uppercase tracking-widest mb-4"
-            style={{ color: "var(--cms-muted)" }}
-          >
-            Content Modules
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {QUICK_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                id={`quick-link-${link.label.toLowerCase().replace(/\s+/g, "-")}`}
-                className="cms-card p-5 rounded-xl flex items-start gap-4 group transition-all duration-200 hover:-translate-y-0.5"
-                style={{ textDecoration: "none" }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    link.accent + "40";
-                  (e.currentTarget as HTMLAnchorElement).style.background =
-                    link.accent + "08";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.borderColor =
-                    "var(--cms-border)";
-                  (e.currentTarget as HTMLAnchorElement).style.background =
-                    "var(--cms-surface)";
-                }}
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
-                  style={{
-                    background: link.accent + "18",
-                    border: `1px solid ${link.accent}30`,
-                  }}
-                >
-                  {link.icon}
-                </div>
-                <div className="min-w-0">
-                  <p
-                    className="font-semibold text-sm"
-                    style={{ color: "var(--cms-text)" }}
-                  >
-                    {link.label}
-                  </p>
-                  <p
-                    className="text-xs mt-0.5 leading-relaxed"
-                    style={{ color: "var(--cms-muted)" }}
-                  >
-                    {link.description}
-                  </p>
-                </div>
-                <span
-                  className="ml-auto flex-shrink-0 text-xs group-hover:translate-x-1 transition-transform duration-150"
-                  style={{ color: "var(--cms-muted)" }}
-                >
-                  →
-                </span>
-              </Link>
-            ))}
+            <a
+              href="https://aic-techno.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-lg font-extrabold text-sm bg-sky-500 text-white hover:bg-sky-400 transition-all shadow-md shrink-0 flex items-center gap-2"
+            >
+              <span>View Production Site</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
           </div>
         </div>
 
-        {/* Info footer */}
-        <div
-          className="rounded-xl px-5 py-4 text-xs"
-          style={{
-            background: "var(--cms-surface-2)",
-            border: "1px solid var(--cms-border)",
-            color: "var(--cms-muted)",
-          }}
-        >
-          <strong style={{ color: "var(--cms-text-2)" }}>Note:</strong> Content
-          changes are fetched live from Firestore by the static website. No
-          rebuild or redeploy is needed after saving changes here.
+        {/* Metric Cards — Full Width Grid */}
+        <div className="w-full">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xs font-black text-black uppercase tracking-widest">
+              Key Content Metrics
+            </h3>
+            <span className="flex items-center gap-1.5 text-xs text-emerald-800 font-extrabold">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Realtime Sync Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-full">
+            {statCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <div
+                  key={card.title}
+                  className="cms-card p-5 flex flex-col justify-between space-y-4 w-full"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-black">
+                      {card.title}
+                    </span>
+                    <div className={`p-2 rounded-lg ${card.bg} ${card.border} border`}>
+                      <Icon className={`w-4 h-4 ${card.color}`} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-3xl font-black text-black tracking-tight">
+                      {loadingStats ? (
+                        <div className="h-8 w-12 rounded bg-slate-200 animate-pulse-soft" />
+                      ) : (
+                        card.value ?? 0
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dynamic Modules Grid — Full Width Responsive Grid */}
+        <div className="space-y-4 w-full">
+          <h3 className="text-xs font-black text-black uppercase tracking-widest">
+            Active Management Modules
+          </h3>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 w-full">
+            {quickModules.map((mod) => {
+              const Icon = mod.icon;
+              return (
+                <Link
+                  key={mod.href}
+                  href={mod.href}
+                  className="cms-card-interactive p-6 flex flex-col justify-between space-y-5 group w-full"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="p-3 rounded-xl bg-sky-50 border border-sky-200 group-hover:bg-sky-100 transition-colors">
+                        <Icon className="w-6 h-6 text-sky-700" />
+                      </div>
+                      <span className="text-[10px] font-extrabold text-sky-900 uppercase tracking-wider px-2 py-0.5 rounded bg-sky-100 border border-sky-300">
+                        {mod.badge}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h4 className="text-base font-extrabold text-black group-hover:text-sky-700 transition-colors">
+                        {mod.label}
+                      </h4>
+                      <p className="text-xs text-slate-800 font-medium mt-1 leading-relaxed">
+                        {mod.desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center text-xs font-bold text-sky-700 group-hover:translate-x-1 transition-transform">
+                    <span>Manage Module</span>
+                    <ArrowRight className="w-4 h-4 ml-1.5" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </main>
     </div>

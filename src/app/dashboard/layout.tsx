@@ -56,8 +56,8 @@ export default function DashboardLayout({
       {/* Fixed sidebar */}
       <Sidebar />
 
-      {/* Main content — offset by sidebar width */}
-      <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: "240px" }}>
+      {/* Main content — offset by sidebar width (w-64 = 256px) */}
+      <div className="flex-1 flex flex-col min-h-screen" style={{ marginLeft: "256px" }}>
         {/* Page content rendered here — each page provides its own Topbar */}
         {children}
       </div>

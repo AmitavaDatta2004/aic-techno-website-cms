@@ -220,7 +220,7 @@ export default function PartnersPage() {
         </div>
       )}
 
-      <main className="flex-1 px-8 py-8 space-y-6 animate-fade-in max-w-6xl w-full mx-auto">
+      <main className="flex-1 px-8 py-8 space-y-6 animate-fade-in w-full">
         
         {/* TABS */}
         <div className="flex space-x-4 border-b border-[var(--cms-border)] pb-2">

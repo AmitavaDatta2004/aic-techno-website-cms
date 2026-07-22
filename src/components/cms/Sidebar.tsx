@@ -4,24 +4,65 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth";
+import {
+  LayoutDashboard,
+  Sparkles,
+  Info,
+  Users,
+  HeartHandshake,
+  Briefcase,
+  Building2,
+  Compass,
+  Image as ImageIcon,
+  Sliders,
+  ShieldCheck,
+  LogOut,
+  ExternalLink,
+  type LucideIcon,
+} from "lucide-react";
 
-interface NavItem {
-  href: string;
-  label: string;
-  icon: string;
+interface NavGroup {
+  title: string;
+  items: {
+    href: string;
+    label: string;
+    icon: LucideIcon;
+    badge?: string;
+  }[];
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "◈" },
-  { href: "/dashboard/hero", label: "Hero Section", icon: "🏠" },
-  { href: "/dashboard/about", label: "About", icon: "ℹ️" },
-  { href: "/dashboard/mentors", label: "Ecosystem Enablers", icon: "🧑‍🤝‍🧑" },
-  { href: "/dashboard/social-mentors", label: "Social Mentors", icon: "👥" },
-  { href: "/dashboard/careers", label: "Careers", icon: "💼" },
-  { href: "/dashboard/partners", label: "Partners", icon: "🤝" },
-  { href: "/dashboard/back2bengal", label: "Back2Bengal", icon: "🐅" },
-  { href: "/dashboard/media", label: "Media Library", icon: "🖼️" },
-  { href: "/dashboard/settings", label: "Site Settings", icon: "⚙️" },
+const NAV_GROUPS: NavGroup[] = [
+  {
+    title: "OVERVIEW",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: "DYNAMIC CONTENT",
+    items: [
+      { href: "/dashboard/mentors", label: "Ecosystem Enablers", icon: Users, badge: "Dynamic" },
+      { href: "/dashboard/social-mentors", label: "Social Mentors", icon: HeartHandshake, badge: "Dynamic" },
+      { href: "/dashboard/careers", label: "Careers", icon: Briefcase, badge: "Dynamic" },
+      { href: "/dashboard/partners", label: "Partners", icon: Building2, badge: "Dynamic" },
+      { href: "/dashboard/media", label: "Media Library", icon: ImageIcon, badge: "Storage" },
+    ],
+  },
+  {
+    title: "STATIC SECTIONS",
+    items: [
+      { href: "/dashboard/hero", label: "Hero Section", icon: Sparkles },
+      { href: "/dashboard/about", label: "About Section", icon: Info },
+      { href: "/dashboard/back2bengal", label: "Back2Bengal", icon: Compass },
+    ],
+  },
+  {
+    title: "SYSTEM & CONTROL",
+    items: [
+      { href: "/dashboard/settings", label: "Site Settings", icon: Sliders },
+      { href: "/dashboard/admins", label: "Admin Access", icon: ShieldCheck },
+    ],
+  },
 ];
 
 export function Sidebar() {
@@ -30,9 +71,7 @@ export function Sidebar() {
 
   async function handleLogout() {
     await signOut();
-    // Clear session cookie
-    document.cookie =
-      "cms_authed=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "cms_authed=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     router.push("/login");
   }
 
@@ -44,121 +83,89 @@ export function Sidebar() {
   return (
     <aside
       id="cms-sidebar"
-      className="fixed top-0 left-0 h-full w-60 flex flex-col z-50"
-      style={{
-        background: "var(--cms-surface)",
-        borderRight: "1px solid var(--cms-border)",
-      }}
+      className="fixed top-0 left-0 h-full w-64 flex flex-col z-50 bg-white border-r border-slate-300 shadow-xs select-none"
     >
-      {/* Logo */}
-      <div
-        className="px-5 py-5 flex items-center gap-3"
-        style={{ borderBottom: "1px solid var(--cms-border)" }}
-      >
-        <div
-          className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white font-black text-xs"
-          style={{ background: "var(--cms-accent)" }}
-        >
-          AIC
-        </div>
-        <div>
-          <div className="text-cms-text font-bold text-sm leading-tight">
-            AIC Techno
+      {/* Brand Header */}
+      <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-sky-600/20">
+            AIC
           </div>
-          <div className="text-cms-muted text-xs leading-tight">CMS</div>
+          <div>
+            <div className="text-black font-extrabold text-sm tracking-tight leading-none">
+              AIC Techno
+            </div>
+            <div className="text-sky-700 font-bold text-[10px] tracking-wider uppercase mt-1">
+              Enterprise CMS
+            </div>
+          </div>
         </div>
+
+        <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 ring-4 ring-emerald-100" title="System Online" />
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150"
-              style={{
-                background: active
-                  ? "rgba(99,102,241,0.15)"
-                  : "transparent",
-                color: active
-                  ? "var(--cms-accent)"
-                  : "var(--cms-text-2)",
-                border: active
-                  ? "1px solid rgba(99,102,241,0.25)"
-                  : "1px solid transparent",
-              }}
-              onMouseEnter={(e) => {
-                if (!active) {
-                  (e.currentTarget as HTMLAnchorElement).style.background =
-                    "rgba(255,255,255,0.04)";
-                  (e.currentTarget as HTMLAnchorElement).style.color =
-                    "var(--cms-text)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!active) {
-                  (e.currentTarget as HTMLAnchorElement).style.background =
-                    "transparent";
-                  (e.currentTarget as HTMLAnchorElement).style.color =
-                    "var(--cms-text-2)";
-                }
-              }}
-            >
-              <span className="text-base w-5 text-center flex-shrink-0">
-                {item.icon}
-              </span>
-              <span className="truncate">{item.label}</span>
-              {active && (
-                <span
-                  className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: "var(--cms-accent)" }}
-                />
-              )}
-            </Link>
-          );
-        })}
+      {/* Navigation Menu */}
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.title} className="space-y-1">
+            <div className="px-3 text-[10px] font-black text-slate-800 uppercase tracking-widest mb-2">
+              {group.title}
+            </div>
+            {group.items.map((item) => {
+              const active = isActive(item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs transition-all duration-150 ${
+                    active
+                      ? "bg-sky-50 text-sky-800 font-bold shadow-xs border border-sky-300"
+                      : "text-slate-900 font-semibold hover:text-black hover:bg-slate-100 border border-transparent"
+                  }`}
+                >
+                  <Icon
+                    className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                      active ? "text-sky-700" : "text-slate-700 group-hover:text-black"
+                    }`}
+                  />
+                  <span className="truncate">{item.label}</span>
+
+                  {item.badge && !active && (
+                    <span className="ml-auto text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-200 text-slate-800 border border-slate-300">
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {active && (
+                    <span className="ml-auto w-2 h-2 rounded-full bg-sky-600" />
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* Divider + footer */}
-      <div style={{ borderTop: "1px solid var(--cms-border)" }}>
-        {/* Live site link */}
+      {/* Footer Actions */}
+      <div className="p-3 border-t border-slate-200 bg-slate-100/80 space-y-1">
         <a
           href="https://aic-techno.com"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-6 py-3 text-xs transition-colors duration-150"
-          style={{ color: "var(--cms-muted)" }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLAnchorElement).style.color =
-              "var(--cms-text-2)")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLAnchorElement).style.color =
-              "var(--cms-muted)")
-          }
+          className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold text-slate-800 hover:text-black hover:bg-slate-200 transition-colors"
         >
-          <span>↗</span>
-          <span>View Live Site</span>
+          <ExternalLink className="w-4 h-4 text-slate-700" />
+          <span>View Live Website</span>
         </a>
 
-        {/* Logout */}
         <button
           id="logout-btn"
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors duration-150"
-          style={{ color: "var(--cms-muted)" }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color =
-              "var(--cms-danger)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color =
-              "var(--cms-muted)";
-          }}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold text-slate-800 hover:text-rose-700 hover:bg-rose-100 transition-colors text-left"
         >
-          <span className="text-base">⎋</span>
+          <LogOut className="w-4 h-4 text-slate-700 group-hover:text-rose-700" />
           <span>Sign Out</span>
         </button>
       </div>
