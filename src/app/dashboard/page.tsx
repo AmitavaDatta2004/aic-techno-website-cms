@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Zap,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
 interface Stats {
@@ -125,23 +126,26 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#F9F9F9]">
+    <div className="flex flex-col min-h-screen w-full">
       <Topbar title="Overview" />
 
       {/* Full-width container */}
       <main className="flex-1 px-8 py-8 space-y-8 w-full">
-        {/* Welcome Banner — Rich Obsidian & Maroon Gradient */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-black via-[#1F0008] to-[#4D0013] text-white p-8 sm:p-10 shadow-xl border border-[#660019]/40 w-full">
+        {/* Welcome Banner — Rich Obsidian & Maroon Executive Hero */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0F172A] via-[#2A000B] to-[#590017] text-white p-8 sm:p-10 shadow-xl border border-[#800020]/30 w-full">
+          {/* Ambient light glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#800020]/20 rounded-full blur-3xl pointer-events-none" />
+          
           <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-extrabold uppercase tracking-widest">
-                <Zap className="w-3.5 h-3.5 text-rose-300" />
-                Live Firestore Sync Active
+            <div className="space-y-3.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/20 text-white text-[11px] font-extrabold uppercase tracking-widest backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-rose-300 animate-pulse-glow" />
+                Live Firestore Synchronization Enabled
               </div>
-              <h2 className="text-3xl font-black tracking-tight text-white leading-tight">
+              <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-tight">
                 AIC Techno Innovation & Incubation Council
               </h2>
-              <p className="text-sm text-[#EEEEEE] leading-relaxed font-normal max-w-2xl">
+              <p className="text-sm text-slate-200 leading-relaxed font-normal max-w-2xl">
                 Center for Innovation & Entrepreneurship — West Bengal&apos;s first Atal Incubation Centre. Updates made in this CMS reflect live on{" "}
                 <a
                   href="https://aic-techno.com"
@@ -151,7 +155,7 @@ export default function DashboardPage() {
                 >
                   aic-techno.com
                 </a>{" "}
-                without rebuilds.
+                without manual rebuilds.
               </p>
             </div>
 
@@ -159,7 +163,7 @@ export default function DashboardPage() {
               href="https://aic-techno.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 rounded text-white bg-[#800020] hover:bg-[#660019] font-extrabold text-xs tracking-wider uppercase transition-all shadow-md shrink-0 flex items-center gap-2"
+              className="px-6 py-3.5 rounded-xl text-white bg-gradient-to-r from-[#800020] to-[#600018] hover:from-[#940026] hover:to-[#70001B] font-extrabold text-xs tracking-wider uppercase transition-all shadow-lg shadow-[#800020]/30 shrink-0 flex items-center gap-2 border border-white/10"
             >
               <span>View Production Site</span>
               <ExternalLink className="w-4 h-4" />
@@ -168,37 +172,38 @@ export default function DashboardPage() {
         </div>
 
         {/* Metric Cards — Dynamic Auto-Fit Grid */}
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-black text-black uppercase tracking-[2.5px]">
-              Key Content Metrics
+        <div className="w-full space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black text-[#0F172A] uppercase tracking-[2.5px] flex items-center gap-2">
+              <span>Key Content Metrics</span>
+              <div className="h-2 w-2 rounded-full bg-[#800020]" />
             </h3>
-            <span className="flex items-center gap-1.5 text-xs text-[#800020] font-extrabold">
+            <span className="flex items-center gap-1.5 text-xs text-[#800020] font-extrabold bg-[#FFF0F3] px-3 py-1 rounded-full border border-[#FECDD3]">
               <CheckCircle2 className="w-4 h-4 text-[#800020]" /> Realtime Sync Active
             </span>
           </div>
 
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4 w-full">
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-5 w-full">
             {statCards.map((card) => {
               const Icon = card.icon;
               return (
                 <div
                   key={card.title}
-                  className="bg-white border border-[#EEEEEE] rounded-xl p-6 flex flex-col justify-between space-y-4 w-full shadow-xs hover:border-[#800020] transition-colors"
+                  className="cms-card p-6 flex flex-col justify-between space-y-4 w-full hover:border-[#800020]/50 transition-all group"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-[#555555] uppercase tracking-wider">
+                    <span className="text-xs font-extrabold text-[#64748B] uppercase tracking-wider">
                       {card.title}
                     </span>
-                    <div className="p-2 rounded bg-[#FFF0F2] border border-[#FECDD3]">
-                      <Icon className="w-4 h-4 text-[#800020]" />
+                    <div className="p-2.5 rounded-xl bg-[#FFF0F3] border border-[#FECDD3] group-hover:bg-[#800020] group-hover:text-white transition-colors">
+                      <Icon className="w-4 h-4 text-[#800020] group-hover:text-white transition-colors" />
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-4xl font-black text-black tracking-tight leading-none">
+                    <div className="text-4xl font-black text-[#0F172A] tracking-tight leading-none">
                       {loadingStats ? (
-                        <div className="h-8 w-12 rounded bg-[#EEEEEE] animate-pulse-soft" />
+                        <div className="h-8 w-14 rounded-md bg-slate-200 animate-pulse" />
                       ) : (
                         card.value ?? 0
                       )}
@@ -212,8 +217,9 @@ export default function DashboardPage() {
 
         {/* Dynamic Modules Grid */}
         <div className="space-y-4 w-full">
-          <h3 className="text-xs font-black text-black uppercase tracking-[2.5px]">
-            Active Management Modules
+          <h3 className="text-xs font-black text-[#0F172A] uppercase tracking-[2.5px] flex items-center gap-2">
+            <span>Active Management Modules</span>
+            <div className="h-2 w-2 rounded-full bg-[#800020]" />
           </h3>
 
           <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-5 w-full">
@@ -225,27 +231,27 @@ export default function DashboardPage() {
                   href={mod.href}
                   className="cms-card-interactive p-6 flex flex-col justify-between space-y-5 group w-full"
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-3.5">
                     <div className="flex items-center justify-between">
-                      <div className="p-3 rounded bg-[#FFF0F2] border border-[#FECDD3] group-hover:bg-[#800020] group-hover:text-white transition-colors">
+                      <div className="p-3 rounded-xl bg-[#FFF0F3] border border-[#FECDD3] group-hover:bg-[#800020] group-hover:text-white transition-all shadow-xs">
                         <Icon className="w-5 h-5 text-[#800020] group-hover:text-white transition-colors" />
                       </div>
-                      <span className="text-[10px] font-extrabold text-[#800020] uppercase tracking-wider px-2.5 py-0.5 rounded bg-[#FFF0F2] border border-[#FECDD3]">
+                      <span className="text-[10px] font-extrabold text-[#800020] uppercase tracking-wider px-2.5 py-1 rounded-md bg-[#FFF0F3] border border-[#FECDD3]">
                         {mod.badge}
                       </span>
                     </div>
 
                     <div>
-                      <h4 className="text-base font-black text-black group-hover:text-[#800020] transition-colors">
+                      <h4 className="text-base font-black text-[#0F172A] group-hover:text-[#800020] transition-colors">
                         {mod.label}
                       </h4>
-                      <p className="text-xs text-[#555555] font-medium mt-1 leading-relaxed">
+                      <p className="text-xs text-[#64748B] font-medium mt-1 leading-relaxed">
                         {mod.desc}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center text-xs font-bold text-[#800020] group-hover:translate-x-1 transition-transform">
+                  <div className="flex items-center text-xs font-extrabold text-[#800020] group-hover:translate-x-1.5 transition-transform">
                     <span>Manage Module</span>
                     <ArrowRight className="w-4 h-4 ml-1.5" />
                   </div>

@@ -1,32 +1,32 @@
 @import "tailwindcss";
 
-/* ─── AIC Techno CMS — Obsidian & Rich Maroon Design System ───────────────
-   Monochrome obsidian foundation with a rich executive Maroon accent (#800020)
+/* ─── AIC Techno CMS — Executive Obsidian & Burgundy Maroon System ────────
+   Designed for maximum visual impact, rich depth, and enterprise polish.
    ────────────────────────────────────────────────────────────────────────── */
 
 :root {
   /* Surfaces */
-  --cms-bg:            #F9F9F9;   /* Crisp Off-White */
+  --cms-bg:            #F8F9FA;   /* Premium Executive Off-White */
   --cms-surface:       #FFFFFF;   /* Pure White Card */
-  --cms-surface-2:     #F5F5F5;   /* Sub-surface */
-  --cms-surface-hover: #EEEEEE;   /* Hover State */
-  --cms-border:        #E2E2E2;   /* 1px Border */
+  --cms-surface-2:     #F3F4F6;   /* Sub-surface */
+  --cms-surface-hover: #EDEFF2;   /* Hover State */
+  --cms-border:        #E5E7EB;   /* Crisp 1px Border */
   --cms-border-focus:  #800020;   /* Rich Maroon Focus */
 
-  /* Color Accents (Rich Maroon & Black) */
-  --cms-accent:        #800020;   /* Executive Deep Maroon */
-  --cms-accent-hover:  #660019;   /* Darker Maroon */
-  --cms-accent-light:  #FFF0F2;   /* Soft Maroon Tint */
-  --cms-success:       #047857;   /* Emerald */
-  --cms-success-light: #D1FAE5;
-  --cms-danger:        #991B1B;   /* Deep Red */
-  --cms-danger-light:  #FEE2E2;
-  --cms-warning:       #B45309;
+  /* Color Accents */
+  --cms-accent:        #800020;   /* Executive Deep Burgundy Maroon */
+  --cms-accent-hover:  #600018;   /* Darker Burgundy */
+  --cms-accent-light:  #FFF0F3;   /* Soft Maroon Tint */
+  --cms-success:       #059669;   /* Emerald Success */
+  --cms-success-light: #ECFDF5;
+  --cms-danger:        #DC2626;   /* Deep Red */
+  --cms-danger-light:  #FEF2F2;
+  --cms-warning:       #D97706;
 
-  /* Text Hierarchy */
-  --cms-text:          #000000;   /* Solid Black Headings */
-  --cms-text-2:        #1A1A1A;   /* Near-Black Text */
-  --cms-muted:         #555555;   /* Gray 500 Captions */
+  /* Typography */
+  --cms-text:          #0F172A;   /* Slate 900 Heading */
+  --cms-text-2:        #334155;   /* Slate 700 Body */
+  --cms-muted:         #64748B;   /* Slate 500 Subtitle */
 
   /* Font */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -48,7 +48,7 @@
   --font-sans:               var(--font-sans);
 }
 
-/* ─── Base Reset ─────────────────────────────────────────────────────────── */
+/* ─── Base Reset & Ambient Mesh Background ────────────────────────────────── */
 
 *,
 *::before,
@@ -63,7 +63,11 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--cms-bg);
+  background-color: var(--cms-bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(128, 0, 32, 0.025) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.02) 0px, transparent 50%);
+  background-attachment: fixed;
   color: var(--cms-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -71,102 +75,109 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #0F172A;
 }
 ::-webkit-scrollbar-thumb {
   background: #800020;
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
-/* ─── Components ─────────────────────────────────────────────────────────── */
+/* ─── Modern Card System ─────────────────────────────────────────────────── */
 
 .cms-card {
   background: #FFFFFF;
-  border: 1px solid #EEEEEE;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cms-card-interactive {
   background: #FFFFFF;
-  border: 1px solid #EEEEEE;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
 }
 .cms-card-interactive:hover {
-  border-color: #800020;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(128, 0, 32, 0.12);
+  border-color: rgba(128, 0, 32, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -8px rgba(128, 0, 32, 0.15), 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .cms-input {
   background: #FFFFFF;
-  border: 1px solid #CCCCCC;
-  border-radius: 6px;
-  color: #000000;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  color: #0F172A;
   font-weight: 500;
   padding: 10px 14px;
   font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   width: 100%;
 }
 .cms-input:focus {
   border-color: #800020;
-  box-shadow: 0 0 0 3px rgba(128, 0, 32, 0.15);
+  box-shadow: 0 0 0 3.5px rgba(128, 0, 32, 0.12);
 }
 .cms-input::placeholder {
-  color: #888888;
+  color: #94A3B8;
 }
 
-/* Primary Button — Deep Maroon */
+/* Primary Button — Deep Burgundy Maroon with Glossy Hover */
 .cms-btn-primary {
-  background: #800020;
+  background: linear-gradient(135deg, #800020 0%, #600018 100%);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 13px;
   padding: 10px 22px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   cursor: pointer;
   letter-spacing: 0.2px;
+  box-shadow: 0 4px 14px rgba(128, 0, 32, 0.25);
 }
 .cms-btn-primary:hover {
-  background: #660019;
+  background: linear-gradient(135deg, #940026 0%, #70001B 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(128, 0, 32, 0.3);
+  box-shadow: 0 6px 20px rgba(128, 0, 32, 0.35);
+}
+.cms-btn-primary:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .cms-btn-secondary {
   background: #FFFFFF;
-  color: #000000;
+  color: #0F172A;
   font-weight: 700;
   font-size: 13px;
   padding: 10px 22px;
-  border-radius: 6px;
-  border: 1px solid #000000;
+  border-radius: 8px;
+  border: 1px solid #E5E7EB;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
   cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 .cms-btn-secondary:hover {
-  background: #FFF0F2;
-  border-color: #800020;
+  background: #FFF0F3;
+  border-color: #FECDD3;
   color: #800020;
 }
 
@@ -181,27 +192,18 @@ body {
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
-.cms-badge-sky {
-  background: #FFF0F2;
-  color: #800020;
-  border: 1px solid #FECDD3;
-}
-.cms-badge-emerald {
-  background: #F5F5F5;
-  color: #000000;
-  border: 1px solid #CCCCCC;
-}
-.cms-badge-rose {
-  background: #FFF0F0;
-  color: #991B1B;
-  border: 1px solid #FFCCCC;
-}
 
 /* ─── Keyframe Animations ─────────────────────────────────────────────── */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in { animation: fadeIn 0.25s ease both; }
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.08); }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
