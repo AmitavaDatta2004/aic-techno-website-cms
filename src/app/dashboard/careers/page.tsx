@@ -58,7 +58,6 @@ export default function CareersPage() {
   const [formData, setFormData] = useState<{
     dept: string;
     title: string;
-    icon: string;
     tags: string;
     applyLink: string;
     order: number;
@@ -66,7 +65,6 @@ export default function CareersPage() {
   }>({
     dept: "",
     title: "",
-    icon: "💼",
     tags: "",
     applyLink: "",
     order: 0,
@@ -92,7 +90,6 @@ export default function CareersPage() {
       setFormData({
         dept: career.dept ?? "",
         title: career.title ?? "",
-        icon: career.icon ?? "💼",
         tags: (career.tags ?? []).join(", "),
         applyLink: career.applyLink ?? "",
         order: career.order ?? 0,
@@ -103,7 +100,6 @@ export default function CareersPage() {
       setFormData({
         dept: "",
         title: "",
-        icon: "💼",
         tags: "",
         applyLink: "",
         order: careers.length,
@@ -128,7 +124,6 @@ export default function CareersPage() {
       const payload = {
         dept: formData.dept,
         title: formData.title,
-        icon: formData.icon,
         tags: tagsArray,
         applyLink: formData.applyLink,
         order: formData.order,
@@ -226,7 +221,6 @@ export default function CareersPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-[var(--cms-border)] bg-[var(--cms-surface-2)]">
-                    <th className="p-4 text-xs font-bold uppercase tracking-widest text-[var(--cms-muted)]">Icon</th>
                     <th className="p-4 text-xs font-bold uppercase tracking-widest text-[var(--cms-muted)]">Department</th>
                     <th className="p-4 text-xs font-bold uppercase tracking-widest text-[var(--cms-muted)]">Job Title</th>
                     <th className="p-4 text-xs font-bold uppercase tracking-widest text-[var(--cms-muted)]">Tags</th>
@@ -241,7 +235,6 @@ export default function CareersPage() {
                       key={career.id}
                       className="hover:bg-[var(--cms-surface-2)] transition-colors group"
                     >
-                      <td className="p-4 text-xl">{career.icon ?? '💼'}</td>
                       <td className="p-4 text-sm font-medium text-[var(--cms-text-2)]">
                         {career.dept ?? '—'}
                       </td>
@@ -328,19 +321,6 @@ export default function CareersPage() {
             </div>
 
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[var(--cms-muted)]">
-                  Icon (Emoji)
-                </label>
-                <input
-                  type="text"
-                  className="cms-input w-full"
-                  value={formData.icon}
-                  onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="💼"
-                />
-              </div>
-
               <div className="space-y-1">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[var(--cms-muted)]">
                   Department

@@ -18,21 +18,21 @@ const DEFAULT_DATA: Omit<ApplyContent, "updatedAt"> = {
       title: "Pre-Incubation",
       description: "For early-stage ideas and founders validating their concept. Get access to mentorship, workshops, and co-working space.",
       applyUrl: "https://forms.gle/pVnKUPgfkyxPjhpTA",
-      icon: "🌱",
+      icon: "",
     },
     {
       stage: 2,
       title: "Incubation",
       description: "For startups with an MVP ready to scale. Access seed funding, investor connects, and dedicated incubation support.",
       applyUrl: "https://forms.gle/GERw6k6WYNAMcdZ87",
-      icon: "🚀",
+      icon: "",
     },
     {
       stage: 3,
       title: "Scale-Up",
       description: "For growth-stage startups ready to expand markets, raise Series A, and build their team.",
       applyUrl: "https://forms.gle/GxNbFg71CtuiNA9p7",
-      icon: "📈",
+      icon: "",
     },
   ],
 };
@@ -48,7 +48,7 @@ export default function ApplyPage() {
   const [stageDraft, setStageDraft] = useState<ApplyStage | null>(null);
   const [showAdd, setShowAdd]   = useState(false);
   const [newStage, setNewStage] = useState<Omit<ApplyStage, "stage">>({
-    title: "", description: "", applyUrl: "", icon: "🚀",
+    title: "", description: "", applyUrl: "", icon: "",
   });
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function ApplyPage() {
       ...newStage,
     };
     setData((d) => ({ ...d, stages: [...d.stages, stage] }));
-    setNewStage({ title: "", description: "", applyUrl: "", icon: "🚀" });
+    setNewStage({ title: "", description: "", applyUrl: "", icon: "" });
     setShowAdd(false);
   };
 
@@ -143,15 +143,9 @@ export default function ApplyPage() {
               <button onClick={() => setEditIdx(null)} className="w-7 h-7 rounded-full bg-[var(--cms-surface-2)] flex items-center justify-center text-[var(--cms-muted)] hover:bg-[var(--cms-border)]">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">
-              <div className="grid grid-cols-[56px_1fr] gap-3">
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Icon</label>
-                  <input className="cms-input text-center text-xl" value={stageDraft.icon} onChange={(e) => setStageDraft({ ...stageDraft, icon: e.target.value })} />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Stage Title *</label>
-                  <input className="cms-input" value={stageDraft.title} onChange={(e) => setStageDraft({ ...stageDraft, title: e.target.value })} />
-                </div>
+              <div>
+                <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Stage Title *</label>
+                <input className="cms-input" value={stageDraft.title} onChange={(e) => setStageDraft({ ...stageDraft, title: e.target.value })} />
               </div>
               <div>
                 <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Description</label>
@@ -215,23 +209,19 @@ export default function ApplyPage() {
           {showAdd && (
             <div className="px-6 py-4 bg-[var(--cms-accent-light)] border-b border-[var(--cms-border)] space-y-3">
               <p className="text-xs font-bold text-[var(--cms-accent)]">New Stage</p>
-              <div className="grid grid-cols-[56px_1fr] gap-3">
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Icon</label>
-                  <input className="cms-input text-center text-xl" value={newStage.icon} onChange={(e) => setNewStage({ ...newStage, icon: e.target.value })} />
-                </div>
+              <div className="space-y-3">
                 <div>
                   <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Title *</label>
                   <input className="cms-input" placeholder="e.g. Pre-Incubation" value={newStage.title} onChange={(e) => setNewStage({ ...newStage, title: e.target.value })} />
                 </div>
-              </div>
-              <div>
-                <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Description</label>
-                <textarea className="cms-input resize-none" rows={2} placeholder="Who this stage is for…" value={newStage.description} onChange={(e) => setNewStage({ ...newStage, description: e.target.value })} />
-              </div>
-              <div>
-                <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Google Form URL</label>
-                <input className="cms-input font-mono text-xs" type="url" placeholder="https://forms.gle/..." value={newStage.applyUrl} onChange={(e) => setNewStage({ ...newStage, applyUrl: e.target.value })} />
+                <div>
+                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Description</label>
+                  <textarea className="cms-input resize-none" rows={2} placeholder="Who this stage is for…" value={newStage.description} onChange={(e) => setNewStage({ ...newStage, description: e.target.value })} />
+                </div>
+                <div>
+                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Google Form URL</label>
+                  <input className="cms-input font-mono text-xs" type="url" placeholder="https://forms.gle/..." value={newStage.applyUrl} onChange={(e) => setNewStage({ ...newStage, applyUrl: e.target.value })} />
+                </div>
               </div>
               <div className="flex gap-2 justify-end">
                 <button onClick={() => setShowAdd(false)} className="cms-btn-secondary text-xs px-3 py-1.5">Cancel</button>
@@ -247,9 +237,9 @@ export default function ApplyPage() {
                 <div key={idx} className="p-6 hover:bg-[var(--cms-surface-2)] transition-colors group">
                   <div className="flex items-start gap-5">
                     {/* Stage number */}
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-md"
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-md"
                       style={{ background: `linear-gradient(135deg, ${color}, ${color}CC)` }}>
-                      {stage.icon}
+                      <span className="text-sm font-black">{stage.stage}</span>
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -292,39 +282,6 @@ export default function ApplyPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Live Preview */}
-        <div className="cms-card p-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-[var(--cms-muted)] mb-4">Live Preview</h2>
-          <div className="bg-[#F8F9FA] rounded-xl p-6 border border-[var(--cms-border)]">
-            <div className="text-center mb-6">
-              <h3 className="text-xl font-black text-[var(--cms-text)]">{data.title}</h3>
-              <p className="text-sm text-[var(--cms-muted)] mt-2">{data.subtitle}</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {data.stages.map((stage, idx) => {
-                const color = STAGE_COLORS[idx] ?? "#555555";
-                return (
-                  <div key={idx} className="bg-white rounded-xl border p-5 shadow-sm" style={{ borderColor: color + "30" }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">{stage.icon}</span>
-                      <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest" style={{ color }}>Stage {stage.stage}</p>
-                        <p className="text-sm font-black text-[var(--cms-text)]">{stage.title}</p>
-                      </div>
-                    </div>
-                    <p className="text-xs text-[var(--cms-muted)] leading-relaxed mb-3">{stage.description}</p>
-                    <a href={stage.applyUrl} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-lg text-white"
-                      style={{ background: color }}>
-                      Apply Now →
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
           </div>
         </div>
 

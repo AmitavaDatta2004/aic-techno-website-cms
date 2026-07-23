@@ -10,12 +10,12 @@ import {
 } from "@/lib/firestore";
 
 const DEFAULT_PLANS: WorkspacePlan[] = [
-  { name: "Day Pass",       description: "Drop-in access for a single day", icon: "☀️" },
-  { name: "Flexi Seat",     description: "Hot-desking on a weekly/monthly basis", icon: "🔄" },
-  { name: "Dedicated Seat", description: "Your own reserved desk, full-time access", icon: "💺" },
-  { name: "Virtual Office", description: "Business address + mail handling + meeting credits", icon: "🌐" },
-  { name: "Meeting Rooms",  description: "Bookable meeting & boardroom spaces by the hour", icon: "🤝" },
-  { name: "Lab Membership", description: "Access to AI & Product Lab, Fab Lab, and Media Studio", icon: "🔬" },
+  { name: "Day Pass",       description: "Drop-in access for a single day", icon: "" },
+  { name: "Flexi Seat",     description: "Hot-desking on a weekly/monthly basis", icon: "" },
+  { name: "Dedicated Seat", description: "Your own reserved desk, full-time access", icon: "" },
+  { name: "Virtual Office", description: "Business address + mail handling + meeting credits", icon: "" },
+  { name: "Meeting Rooms",  description: "Bookable meeting & boardroom spaces by the hour", icon: "" },
+  { name: "Lab Membership", description: "Access to AI & Product Lab, Fab Lab, and Media Studio", icon: "" },
 ];
 
 const DEFAULT_DATA: Omit<WorkspaceContent, "updatedAt"> = {
@@ -35,7 +35,7 @@ export default function WorkspacePage() {
   const [editPlanIdx, setEditPlanIdx] = useState<number | null>(null);
   const [planDraft, setPlanDraft]     = useState<WorkspacePlan | null>(null);
   const [showAddPlan, setShowAddPlan] = useState(false);
-  const [newPlan, setNewPlan]         = useState<WorkspacePlan>({ name: "", description: "", icon: "🏢" });
+  const [newPlan, setNewPlan]         = useState<WorkspacePlan>({ name: "", description: "", icon: "" });
 
   useEffect(() => {
     getWorkspaceContent().then((d) => {
@@ -82,7 +82,7 @@ export default function WorkspacePage() {
   const addPlan = () => {
     if (!newPlan.name.trim()) return;
     setData((d) => ({ ...d, plans: [...d.plans, { ...newPlan }] }));
-    setNewPlan({ name: "", description: "", icon: "🏢" });
+    setNewPlan({ name: "", description: "", icon: "" });
     setShowAddPlan(false);
   };
 
@@ -127,15 +127,9 @@ export default function WorkspacePage() {
               <button onClick={() => setEditPlanIdx(null)} className="w-7 h-7 rounded-full bg-[var(--cms-surface-2)] flex items-center justify-center text-[var(--cms-muted)] hover:bg-[var(--cms-border)]">✕</button>
             </div>
             <div className="px-6 py-5 space-y-4">
-              <div className="grid grid-cols-[56px_1fr] gap-3">
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Icon</label>
-                  <input className="cms-input text-center text-xl" value={planDraft.icon} onChange={(e) => setPlanDraft({ ...planDraft, icon: e.target.value })} />
-                </div>
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Plan Name *</label>
-                  <input className="cms-input" value={planDraft.name} onChange={(e) => setPlanDraft({ ...planDraft, name: e.target.value })} />
-                </div>
+              <div>
+                <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Plan Name *</label>
+                <input className="cms-input" value={planDraft.name} onChange={(e) => setPlanDraft({ ...planDraft, name: e.target.value })} />
               </div>
               <div>
                 <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Description</label>
@@ -204,11 +198,7 @@ export default function WorkspacePage() {
           {showAddPlan && (
             <div className="px-6 py-4 bg-[var(--cms-accent-light)] border-b border-[var(--cms-border)] space-y-3">
               <p className="text-xs font-bold text-[var(--cms-accent)]">New Plan</p>
-              <div className="grid grid-cols-[56px_1fr_1fr] gap-3">
-                <div>
-                  <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Icon</label>
-                  <input className="cms-input text-center text-xl" value={newPlan.icon} onChange={(e) => setNewPlan({ ...newPlan, icon: e.target.value })} />
-                </div>
+              <div className="grid grid-cols-[1fr_1fr] gap-3">
                 <div>
                   <label className="block text-[9px] font-extrabold uppercase tracking-widest text-[var(--cms-muted)] mb-1">Name *</label>
                   <input className="cms-input" placeholder="e.g. Hot Desk" value={newPlan.name} onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })} />
@@ -228,7 +218,6 @@ export default function WorkspacePage() {
           <div className="divide-y divide-[var(--cms-border)]">
             {data.plans.map((plan, idx) => (
               <div key={idx} className="px-6 py-4 flex items-center gap-4 hover:bg-[var(--cms-surface-2)] transition-colors group">
-                <span className="text-2xl w-10 text-center flex-shrink-0">{plan.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-[var(--cms-text)]">{plan.name}</p>
                   <p className="text-xs text-[var(--cms-muted)] truncate">{plan.description}</p>
@@ -245,28 +234,6 @@ export default function WorkspacePage() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Preview card */}
-        <div className="cms-card p-6">
-          <h2 className="text-xs font-black uppercase tracking-widest text-[var(--cms-muted)] mb-4">Live Preview</h2>
-          <div className="bg-[#0D0D0D] rounded-xl p-6 text-white">
-            <div className="text-center mb-6">
-              <span className="text-xs font-bold uppercase tracking-widest text-white/40 border border-white/20 px-3 py-1 rounded-full">{data.bookingStatus}</span>
-              <h3 className="text-xl font-black mt-3">{data.title}</h3>
-              <p className="text-sm text-white/60 mt-2 max-w-lg mx-auto">{data.subtitle}</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {data.plans.map((p, i) => (
-                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4">
-                  <span className="text-2xl">{p.icon}</span>
-                  <p className="text-sm font-bold mt-2">{p.name}</p>
-                  <p className="text-xs text-white/50 mt-1">{p.description}</p>
-                </div>
-              ))}
-            </div>
-            <p className="text-center text-xs text-white/40 mt-4">{data.email}</p>
           </div>
         </div>
 

@@ -55,7 +55,7 @@ export interface Career {
   id: string;
   dept: string;
   title: string;
-  icon: string;
+  icon?: string;
   tags: string[];
   applyLink: string;
   order: number;
