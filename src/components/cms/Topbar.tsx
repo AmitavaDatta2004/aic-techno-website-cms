@@ -3,7 +3,10 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { ChevronRight, ShieldCheck } from "lucide-react";
-import logoJpeg from "../../../public/logo.jpeg";
+import logoAicTechno from "../../../public/aic-techno-logo.png";
+import logoAim from "../../../public/aim-logo.png";
+import logoNitiAayog from "../../../public/niti-aayog-logo.png";
+import logoTechnoIndia from "../../../public/techno-india-university-logo.png";
 
 interface TopbarProps {
   title: string;
@@ -25,7 +28,7 @@ export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
   return (
     <header
       id="cms-topbar"
-      className="flex items-center justify-between px-8 h-[76px] sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-xs transition-all"
+      className="flex items-center justify-between px-6 h-[76px] sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E7EB] shadow-xs transition-all"
     >
       {/* Left: Title & Breadcrumbs */}
       <div>
@@ -43,38 +46,67 @@ export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
         </h1>
       </div>
 
-      {/* Right: Actions, Official logo.jpeg Website Header Logo, and User Info */}
-      <div className="flex items-center gap-6">
+      {/* Right: Actions, 4 Header Logos in Order, and User Info */}
+      <div className="flex items-center gap-4">
         {actions}
 
-        {/* Official logo.jpeg website header logo */}
-        <div className="flex items-center px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] shadow-xs">
+        {/* 4 Header Logos in Order: 1. AIC Techno, 2. AIM, 3. NITI Aayog, 4. Techno India University */}
+        <div className="hidden lg:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] shadow-xs">
+          {/* 1. AIC Techno Logo */}
           <img
-            src={logoJpeg.src}
+            src={logoAicTechno.src}
             alt="AIC Techno Logo"
-            className="h-11 md:h-12 w-auto object-contain max-h-12 transition-transform hover:scale-105"
+            className="h-9 w-auto object-contain transition-transform hover:scale-105"
+            title="AIC Techno"
+          />
+          <div className="h-6 w-[1px] bg-[#E5E7EB]" />
+
+          {/* 2. Atal Innovation Mission */}
+          <img
+            src={logoAim.src}
+            alt="Atal Innovation Mission"
+            className="h-8 w-auto object-contain transition-transform hover:scale-105"
+            title="Atal Innovation Mission"
+          />
+          <div className="h-6 w-[1px] bg-[#E5E7EB]" />
+
+          {/* 3. NITI Aayog */}
+          <img
+            src={logoNitiAayog.src}
+            alt="NITI Aayog"
+            className="h-8 w-auto object-contain transition-transform hover:scale-105"
+            title="NITI Aayog"
+          />
+          <div className="h-6 w-[1px] bg-[#E5E7EB]" />
+
+          {/* 4. Techno India University */}
+          <img
+            src={logoTechnoIndia.src}
+            alt="An Initiative of Techno India University West Bengal"
+            className="h-8 w-auto object-contain transition-transform hover:scale-105"
+            title="Techno India University"
           />
         </div>
 
         <div className="h-7 w-[1px] bg-[#E5E7EB] hidden sm:block" />
 
         {/* User Pill */}
-        <div className="flex items-center gap-3 bg-gradient-to-r from-[#FFF0F3] to-[#FFF5F7] border border-[#FECDD3] px-4 py-2 rounded-full shadow-xs hover:shadow-md transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#800020] to-[#600018] flex items-center justify-center text-white font-black text-xs shadow-sm">
+        <div className="flex items-center gap-3 bg-gradient-to-r from-[#FFF0F3] to-[#FFF5F7] border border-[#FECDD3] px-3.5 py-1.5 rounded-full shadow-xs hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#800020] to-[#600018] flex items-center justify-center text-white font-black text-xs shadow-sm shrink-0">
             {initials || "A"}
           </div>
-          <div className="text-left hidden sm:block pr-1">
+          <div className="text-left hidden sm:block pr-1 min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-extrabold text-[#0F172A] leading-tight">
+              <span className="text-xs font-extrabold text-[#0F172A] leading-tight truncate">
                 {displayName}
               </span>
               {isAdmin && (
-                <span title="Admin User">
+                <span title="Admin User" className="shrink-0">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#800020]" />
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-[#64748B] font-semibold block leading-tight truncate max-w-[150px]">
+            <span className="text-[10px] text-[#64748B] font-semibold block leading-tight truncate max-w-[130px]">
               {user?.email}
             </span>
           </div>

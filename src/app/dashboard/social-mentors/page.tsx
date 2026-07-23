@@ -10,7 +10,7 @@ import {
   SocialMentor,
 } from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
-import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, Users, ImagePlus, Pencil } from "lucide-react";
+import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, Users, ImagePlus, Pencil, ChevronUp, ChevronDown } from "lucide-react";
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 function toInitials(name: string) {
@@ -440,6 +440,18 @@ export default function SocialMentorsPage() {
     setDeleteTarget(null);
   };
 
+  const handleMoveOrder = async (mentor: SocialMentor, dir: -1 | 1) => {
+    const currentOrder = mentor.order ?? 0;
+    const newOrder = dir === -1 ? Math.max(0, currentOrder - 1) : currentOrder + 1;
+    handleUpdate(mentor.id, "order", newOrder);
+    try {
+      await updateSocialMentor(mentor.id, { order: newOrder });
+      showToast(`Order updated to #${newOrder}`);
+    } catch (err: unknown) {
+      showToast((err as Error).message, "error");
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "var(--cms-bg)" }}>
       <Topbar title="Social Innovation Mentors" breadcrumb="Social Mentors" />
@@ -575,32 +587,46 @@ export default function SocialMentorsPage() {
                 </div>
 
                 {/* Card footer */}
-                <div className="px-5 py-3 border-t border-[#F5F5F5] bg-[#FAFAFA] flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                <div className="px-4 py-2.5 border-t border-[#F5F5F5] bg-[#FAFAFA] flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
                     <button type="button" onClick={() => handleUpdate(mentor.id, "active", !mentor.active)}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all duration-200 ${
-                        mentor.active ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" : "bg-[#F5F5F5] text-[#888888] border-[#E0E0E0] hover:bg-[#EEEEEE]"
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border transition-all ${
+                        mentor.active ? "bg-green-50 text-green-700 border-green-200" : "bg-[#F5F5F5] text-[#888888] border-[#E0E0E0]"
                       }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${mentor.active ? "bg-green-500" : "bg-[#BBBBBB]"}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${mentor.active ? "bg-green-500" : "bg-[#BBBBBB]"}`} />
                       {mentor.active ? "Active" : "Inactive"}
                     </button>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[9px] font-bold text-[#AAAAAA] uppercase tracking-wider">#</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[9px] font-bold text-[#AAAAAA]">#</span>
                       <input type="number"
-                        className="w-12 text-center text-xs font-bold border border-[#E0E0E0] rounded-lg px-1 py-1.5 bg-white text-black outline-none focus:border-[#800020]"
+                        className="w-10 text-center text-xs font-bold border border-[#E0E0E0] rounded-lg px-1 py-1 bg-white text-black outline-none focus:border-[#800020]"
                         value={mentor.order ?? 0} onChange={(e) => handleUpdate(mentor.id, "order", Number(e.target.value))} />
+                      <div className="flex flex-col gap-0.5">
+                        <button type="button" onClick={() => handleMoveOrder(mentor, -1)} title="Move Up (Decrease order #)"
+                          className="w-4 h-3.5 rounded border border-[#E0E0E0] bg-white hover:bg-[#FFF0F3] hover:border-[#800020]/30 hover:text-[#800020] text-[#666666] flex items-center justify-center transition-all">
+                          <ChevronUp className="w-3 h-3" />
+                        </button>
+                        <button type="button" onClick={() => handleMoveOrder(mentor, 1)} title="Move Down (Increase order #)"
+                          className="w-4 h-3.5 rounded border border-[#E0E0E0] bg-white hover:bg-[#FFF0F3] hover:border-[#800020]/30 hover:text-[#800020] text-[#666666] flex items-center justify-center transition-all">
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <button onClick={() => setDeleteTarget(mentor)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all">
-                      <Trash2 className="w-3 h-3" /> Delete
+                      title="Delete mentor"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-red-500 bg-red-50 border border-red-200 hover:bg-red-100 transition-all">
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                     <button onClick={() => handleSaveFooter(mentor)} disabled={saving === mentor.id}
-                      className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold text-white transition-all disabled:opacity-60"
+                      title="Save order & status"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-white transition-all disabled:opacity-60"
                       style={{ background: "linear-gradient(135deg, #047857 0%, #065F46 100%)" }}>
-                      <Save className="w-3 h-3" />
-                      {saving === mentor.id ? "Saving…" : "Save"}
+                      {saving === mentor.id
+                        ? <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
+                        : <Save className="w-3.5 h-3.5" />
+                      }
                     </button>
                   </div>
                 </div>

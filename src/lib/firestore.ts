@@ -31,6 +31,7 @@ export interface Mentor {
   initials: string;
   photoUrl: string;
   linkedIn: string;
+  board: string;   // "Advisory Board" | "Executive Board" | "Extended Mentors" | ""
   order: number;
   active: boolean;
   createdAt?: Timestamp;
@@ -521,4 +522,69 @@ export async function saveBack2BengalContent(data: Omit<Back2BengalContent, "upd
     ...data,
     updatedAt: serverTimestamp(),
   }, { merge: true });
+}
+
+// ─── Workspace ────────────────────────────────────────────────────────────────
+
+export interface WorkspacePlan {
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export interface WorkspaceContent {
+  title: string;
+  subtitle: string;
+  email: string;
+  bookingUrl: string;
+  bookingStatus: string;
+  plans: WorkspacePlan[];
+  updatedAt?: string;
+}
+
+export async function getWorkspaceContent(): Promise<WorkspaceContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "workspace"));
+  return snap.exists() ? (snap.data() as WorkspaceContent) : null;
+}
+
+export async function saveWorkspaceContent(
+  data: Omit<WorkspaceContent, "updatedAt">
+): Promise<void> {
+  await setDoc(
+    doc(db, SITE_CONTENT, "workspace"),
+    { ...data, updatedAt: new Date().toISOString() },
+    { merge: true }
+  );
+}
+
+// ─── Apply / Incubation ───────────────────────────────────────────────────────
+
+export interface ApplyStage {
+  stage: number;
+  title: string;
+  description: string;
+  applyUrl: string;
+  icon: string;
+}
+
+export interface ApplyContent {
+  title: string;
+  subtitle: string;
+  stages: ApplyStage[];
+  updatedAt?: string;
+}
+
+export async function getApplyContent(): Promise<ApplyContent | null> {
+  const snap = await getDoc(doc(db, SITE_CONTENT, "apply"));
+  return snap.exists() ? (snap.data() as ApplyContent) : null;
+}
+
+export async function saveApplyContent(
+  data: Omit<ApplyContent, "updatedAt">
+): Promise<void> {
+  await setDoc(
+    doc(db, SITE_CONTENT, "apply"),
+    { ...data, updatedAt: new Date().toISOString() },
+    { merge: true }
+  );
 }
