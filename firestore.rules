@@ -16,7 +16,7 @@ service cloud.firestore {
     }
 
     // ─── Site Content (single documents) ───────────────────────────────
-    // Documents: hero, aboutTIG, aboutAIC, settings, back2bengal
+    // Documents: hero, aboutTIG, aboutAIC, settings, back2bengal, workspace, apply
     // Public read (static site fetches this), admin-only write
     
     match /siteContent/{document} {
@@ -24,18 +24,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // ─── Mentors ───────────────────────────────────────────────────────
+    // ─── Board Members ──────────────────────────────────────────────────
     // Public read (displayed on static site), admin-only write
     
-    match /mentors/{mentorId} {
+    match /boardMembers/{memberId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ─── Social Mentors ────────────────────────────────────────────────
-    // Public read, admin-only write
+    // ─── Mentors ────────────────────────────────────────────────────────
+    // Public read (displayed on static site), admin-only write
     
-    match /socialMentors/{mentorId} {
+    match /mentors/{mentorId} {
       allow read: if true;
       allow write: if isAdmin();
     }

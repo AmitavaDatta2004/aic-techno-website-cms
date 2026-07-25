@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Topbar } from "@/components/cms/Topbar";
-import { getMentors, getSocialMentors, getCareers, getPartners, getFeaturedPartners, getMediaFiles } from "@/lib/firestore";
+import { getBoardMembers, getMentors, getCareers, getPartners, getFeaturedPartners, getMediaFiles, Career } from "@/lib/firestore";
 import {
   Users,
   HeartHandshake,
@@ -19,8 +19,8 @@ import {
 } from "lucide-react";
 
 interface Stats {
+  boardMembers: number;
   mentors: number;
-  socialMentors: number;
   activeCareers: number;
   partners: number;
   mediaFiles: number;
@@ -33,10 +33,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function loadStats() {
       try {
-        const [mentors, socialMentors, careers, partners, featuredPartners, media] =
+        const [boardMembers, mentors, careers, partners, featuredPartners, media] =
           await Promise.all([
+            getBoardMembers(),
             getMentors(),
-            getSocialMentors(),
             getCareers(),
             getPartners(),
             getFeaturedPartners(),
@@ -44,14 +44,14 @@ export default function DashboardPage() {
           ]);
 
         setStats({
+          boardMembers: boardMembers.length,
           mentors: mentors.length,
-          socialMentors: socialMentors.length,
-          activeCareers: careers.filter((c) => c.active).length,
+          activeCareers: careers.filter((c: Career) => c.active).length,
           partners: partners.length + featuredPartners.length,
           mediaFiles: media.length,
         });
       } catch {
-        setStats({ mentors: 0, socialMentors: 0, activeCareers: 0, partners: 0, mediaFiles: 0 });
+        setStats({ boardMembers: 0, mentors: 0, activeCareers: 0, partners: 0, mediaFiles: 0 });
       } finally {
         setLoadingStats(false);
       }
@@ -61,13 +61,13 @@ export default function DashboardPage() {
 
   const statCards = [
     {
-      title: "Ecosystem Enablers",
-      value: stats?.mentors,
+      title: "Board Members",
+      value: stats?.boardMembers,
       icon: Users,
     },
     {
-      title: "Social Mentors",
-      value: stats?.socialMentors,
+      title: "Mentors Network",
+      value: stats?.mentors,
       icon: HeartHandshake,
     },
     {
@@ -89,15 +89,15 @@ export default function DashboardPage() {
 
   const quickModules = [
     {
-      href: "/dashboard/mentors",
-      label: "Ecosystem Enablers",
-      desc: "Manage domain leads, serial founders & key incubation mentors",
+      href: "/dashboard/board-members",
+      label: "Board Members",
+      desc: "Manage Advisory Board & Executive Board members",
       icon: Users,
     },
     {
-      href: "/dashboard/social-mentors",
-      label: "Social Mentors",
-      desc: "Manage extended network mentors for Social Innovation vertical",
+      href: "/dashboard/mentors",
+      label: "Mentors",
+      desc: "Manage extended network mentors for Social Innovation & domain verticals",
       icon: HeartHandshake,
     },
     {

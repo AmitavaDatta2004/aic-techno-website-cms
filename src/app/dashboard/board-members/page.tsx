@@ -13,7 +13,7 @@ function toInitials(name: string) {
   return name.substring(0, 2).toUpperCase();
 }
 
-const BOARD_OPTIONS = ["Advisory Board", "Executive Board", "Extended Mentors", ""] as const;
+const BOARD_OPTIONS = ["Advisory Board", "Executive Board", ""] as const;
 type BoardOption = typeof BOARD_OPTIONS[number];
 
 /* ── Add BoardMember Modal ────────────────────────────────────────────────────── */
@@ -677,7 +677,7 @@ export default function MentorsPage() {
 
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "var(--cms-bg)" }}>
-      <Topbar title="Mentors & Board Members" breadcrumb="Mentors" />
+      <Topbar title="Board Members Management" breadcrumb="Board Members" />
 
       {toast && (
         <div className={`fixed top-5 right-5 z-[60] flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold animate-fade-in border ${

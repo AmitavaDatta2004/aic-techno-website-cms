@@ -114,7 +114,63 @@ function snapToArray<T>(snap: QuerySnapshot<DocumentData>): T[] {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as T));
 }
 
-// ─── Mentors ──────────────────────────────────────────────────────────────────
+// ─── Board Members ────────────────────────────────────────────────────────────
+
+export interface BoardMember {
+  id: string;
+  name: string;
+  role: string;
+  bio: string;
+  initials: string;
+  photoUrl: string;
+  linkedIn: string;
+  board: string;   // "Advisory Board" | "Executive Board" | ""
+  order: number;
+  active: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+const BOARD_MEMBERS = "boardMembers";
+
+export async function getBoardMembers(): Promise<BoardMember[]> {
+  const snap = await getDocs(collection(db, BOARD_MEMBERS));
+  const items = snapToArray<BoardMember>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+export function subscribeBoardMembers(cb: (members: BoardMember[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, BOARD_MEMBERS), (snap) => {
+    const items = snapToArray<BoardMember>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
+}
+
+export async function addBoardMember(data: Omit<BoardMember, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, BOARD_MEMBERS), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateBoardMember(
+  id: string,
+  data: Partial<Omit<BoardMember, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, BOARD_MEMBERS, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteBoardMember(id: string): Promise<void> {
+  await deleteDoc(doc(db, BOARD_MEMBERS, id));
+}
+
+// ─── Mentors (Social / Extended Mentors) ──────────────────────────────────────
 
 const MENTORS = "mentors";
 
@@ -153,51 +209,6 @@ export async function updateMentor(
 
 export async function deleteMentor(id: string): Promise<void> {
   await deleteDoc(doc(db, MENTORS, id));
-}
-
-// ─── Social Mentors ───────────────────────────────────────────────────────────
-
-const SOCIAL_MENTORS = "socialMentors";
-
-export async function getSocialMentors(): Promise<SocialMentor[]> {
-  const snap = await getDocs(collection(db, SOCIAL_MENTORS));
-  const items = snapToArray<SocialMentor>(snap);
-  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-}
-
-export function subscribeSocialMentors(
-  cb: (mentors: SocialMentor[]) => void
-): Unsubscribe {
-  return onSnapshot(collection(db, SOCIAL_MENTORS), (snap) => {
-    const items = snapToArray<SocialMentor>(snap);
-    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    cb(items);
-  });
-}
-
-export async function addSocialMentor(
-  data: Omit<SocialMentor, "id">
-): Promise<string> {
-  const ref = await addDoc(collection(db, SOCIAL_MENTORS), {
-    ...data,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return ref.id;
-}
-
-export async function updateSocialMentor(
-  id: string,
-  data: Partial<Omit<SocialMentor, "id">>
-): Promise<void> {
-  await updateDoc(doc(db, SOCIAL_MENTORS, id), {
-    ...data,
-    updatedAt: serverTimestamp(),
-  });
-}
-
-export async function deleteSocialMentor(id: string): Promise<void> {
-  await deleteDoc(doc(db, SOCIAL_MENTORS, id));
 }
 
 // ─── Careers ──────────────────────────────────────────────────────────────────

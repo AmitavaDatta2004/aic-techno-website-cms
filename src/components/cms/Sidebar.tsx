@@ -41,13 +41,13 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "DYNAMIC CONTENT",
     items: [
-      { href: "/dashboard/mentors",        label: "Mentors & Board",  icon: Users,          badge: "Dynamic" },
-      { href: "/dashboard/social-mentors", label: "Social Mentors",  icon: HeartHandshake, badge: "Dynamic" },
-      { href: "/dashboard/careers",        label: "Careers",         icon: Briefcase,      badge: "Dynamic" },
-      { href: "/dashboard/partners",       label: "Partners",        icon: Building2,      badge: "Dynamic" },
-      { href: "/dashboard/workspace",      label: "Workspace",       icon: LayoutGrid,     badge: "Dynamic" },
-      { href: "/dashboard/apply",          label: "Apply Stages",    icon: Rocket,         badge: "Dynamic" },
-      { href: "/dashboard/media",          label: "Media Library",   icon: ImageIcon,      badge: "Storage" },
+      { href: "/dashboard/board-members", label: "Board Members", icon: Users,          badge: "Dynamic" },
+      { href: "/dashboard/mentors",       label: "Mentors",       icon: HeartHandshake, badge: "Dynamic" },
+      { href: "/dashboard/careers",       label: "Careers",       icon: Briefcase,      badge: "Dynamic" },
+      { href: "/dashboard/partners",      label: "Partners",      icon: Building2,      badge: "Dynamic" },
+      { href: "/dashboard/workspace",     label: "Workspace",     icon: LayoutGrid,     badge: "Dynamic" },
+      { href: "/dashboard/apply",         label: "Apply Stages",  icon: Rocket,         badge: "Dynamic" },
+      { href: "/dashboard/media",         label: "Media Library", icon: ImageIcon,      badge: "Storage" },
     ],
   },
   {
