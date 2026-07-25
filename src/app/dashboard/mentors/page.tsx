@@ -2,9 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Topbar } from "@/components/cms/Topbar";
-import { subscribeMentors, addMentor, updateMentor, deleteMentor, Mentor } from "@/lib/firestore";
+import {
+  subscribeSocialMentors,
+  addSocialMentor,
+  updateSocialMentor,
+  deleteSocialMentor,
+  SocialMentor,
+} from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
-import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, User, ImagePlus, Pencil, ChevronUp, ChevronDown } from "lucide-react";
+import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, Users, ImagePlus, Pencil, ChevronUp, ChevronDown } from "lucide-react";
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 function toInitials(name: string) {
@@ -13,26 +19,22 @@ function toInitials(name: string) {
   return name.substring(0, 2).toUpperCase();
 }
 
-const BOARD_OPTIONS = ["Advisory Board", "Executive Board", "Extended Mentors", ""] as const;
-type BoardOption = typeof BOARD_OPTIONS[number];
-
-/* ── Add Mentor Modal ────────────────────────────────────────────────────── */
+/* ── Add Social Mentor Modal ─────────────────────────────────────────────── */
 interface AddModalProps {
   defaultOrder: number;
   onClose: () => void;
   onCreated: (msg: string) => void;
 }
-function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
+function AddSocialMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
   const [name, setName]         = useState("");
   const [role, setRole]         = useState("");
   const [initials, setInitials] = useState("");
-  const [bio, setBio]           = useState("");
   const [linkedIn, setLinkedIn] = useState("");
-  const [board, setBoard]       = useState<BoardOption>("Advisory Board");
   const [order, setOrder]       = useState(defaultOrder);
   const [active, setActive]     = useState(true);
   const [saving, setSaving]     = useState(false);
   const [errors, setErrors]     = useState<{ name?: string; role?: string }>({});
+  const [initialsManual, setInitialsManual] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState("");
@@ -49,7 +51,6 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
     setName(val);
     if (!initialsManual) setInitials(val ? toInitials(val) : "");
   };
-  const [initialsManual, setInitialsManual] = useState(false);
 
   const validate = () => {
     const e: { name?: string; role?: string } = {};
@@ -63,11 +64,12 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
     if (!validate()) return;
     setSaving(true);
     let uploadedPhotoUrl = "";
+
     if (selectedFile) {
       setUploading(true);
       setUploadProgress(0);
       try {
-        const path = generateStoragePath("mentors", selectedFile);
+        const path = generateStoragePath("social-mentors", selectedFile);
         uploadedPhotoUrl = await uploadFile(selectedFile, path, (p) => setUploadProgress(p));
       } catch (err: unknown) {
         console.error("Upload error:", err);
@@ -81,18 +83,16 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
     }
 
     try {
-      await addMentor({
+      await addSocialMentor({
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
-        bio: bio.trim(),
         linkedIn: linkedIn.trim(),
         photoUrl: uploadedPhotoUrl,
-        board: board || "",
         order,
         active,
       });
-      onCreated("Mentor added successfully");
+      onCreated("Social mentor added successfully");
       onClose();
     } catch (err: unknown) {
       setSaving(false);
@@ -106,10 +106,10 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEEEEE]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#FFF0F2] flex items-center justify-center">
-              <User className="w-4 h-4 text-[#800020]" />
+              <Users className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Add New Mentor</h2>
+              <h2 className="text-sm font-black text-black">Add Social Mentor</h2>
               <p className="text-[10px] text-[#888888]">Fill in the details below</p>
             </div>
           </div>
@@ -127,7 +127,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
               {photoPreview ? (
                 <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-8 h-8 text-[#DDDDDD]" />
+                <Users className="w-7 h-7 text-[#DDDDDD]" />
               )}
               {uploading && (
                 <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-1">
@@ -137,7 +137,6 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
             </div>
             <div className="flex-1">
               <p className="text-xs font-bold text-black mb-0.5">Profile Photo</p>
-              <p className="text-[10px] text-[#888888] leading-relaxed mb-2">Click the avatar to upload</p>
               <button
                 type="button"
                 disabled={uploading}
@@ -157,71 +156,28 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
 
           <div>
             <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Full Name *</label>
-            <input
-              type="text"
-              className={`cms-input w-full ${errors.name ? "border-red-300 bg-red-50" : ""}`}
-              placeholder="e.g. Rajiv Kumar"
-              value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
-            />
+            <input type="text" className={`cms-input w-full ${errors.name ? "border-red-300 bg-red-50" : ""}`}
+              placeholder="e.g. Priya Sharma" value={name} onChange={(e) => handleNameChange(e.target.value)} />
             {errors.name && <p className="text-[10px] text-red-500 mt-1">{errors.name}</p>}
           </div>
 
           <div className="grid grid-cols-[1fr_90px] gap-3">
             <div>
               <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Role *</label>
-              <input
-                type="text"
-                className={`cms-input w-full ${errors.role ? "border-red-300 bg-red-50" : ""}`}
-                placeholder="e.g. Venture Capitalist"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              />
+              <input type="text" className={`cms-input w-full ${errors.role ? "border-red-300 bg-red-50" : ""}`}
+                placeholder="e.g. Social Innovator" value={role} onChange={(e) => setRole(e.target.value)} />
               {errors.role && <p className="text-[10px] text-red-500 mt-1">{errors.role}</p>}
             </div>
             <div>
               <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Initials</label>
-              <input
-                type="text"
-                className="cms-input w-full text-center font-bold"
-                value={initials}
-                onChange={(e) => { setInitials(e.target.value.toUpperCase()); setInitialsManual(true); }}
-              />
+              <input type="text" className="cms-input w-full text-center font-bold" placeholder="PS" maxLength={3}
+                value={initials} onChange={(e) => { setInitials(e.target.value.toUpperCase()); setInitialsManual(true); }} />
             </div>
           </div>
 
           <div>
-            <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Board / Group</label>
-            <select
-              className="cms-input w-full"
-              value={board}
-              onChange={(e) => setBoard(e.target.value as BoardOption)}
-            >
-              <option value="Advisory Board">Advisory Board</option>
-              <option value="Executive Board">Executive Board</option>
-              <option value="Extended Mentors">Extended Mentors</option>
-              <option value="">Ungrouped</option>
-            </select>
-          </div>
-
-          <div>
             <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">LinkedIn URL</label>
-            <input
-              type="url"
-              className="cms-input w-full"
-              value={linkedIn}
-              onChange={(e) => setLinkedIn(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Bio</label>
-            <textarea
-              className="cms-input w-full resize-none leading-relaxed"
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
+            <input type="url" className="cms-input w-full" value={linkedIn} onChange={(e) => setLinkedIn(e.target.value)} />
           </div>
         </div>
 
@@ -236,17 +192,16 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
   );
 }
 
-/* ── Edit Mentor Modal ───────────────────────────────────────────────────── */
+/* ── Edit Social Mentor Modal ────────────────────────────────────────────── */
 interface EditModalProps {
-  mentor: Mentor;
+  mentor: SocialMentor;
   onClose: () => void;
   onSaved: (msg: string) => void;
 }
-function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
+function EditSocialMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
   const [name, setName]         = useState(mentor.name ?? "");
   const [role, setRole]         = useState(mentor.role ?? "");
   const [initials, setInitials] = useState(mentor.initials ?? "");
-  const [bio, setBio]           = useState(mentor.bio ?? "");
   const [linkedIn, setLinkedIn] = useState(mentor.linkedIn ?? "");
   const [saving, setSaving]     = useState(false);
   const [errors, setErrors]     = useState<{ name?: string; role?: string }>({});
@@ -279,7 +234,7 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
       setUploading(true);
       setUploadProgress(0);
       try {
-        const path = generateStoragePath("mentors", selectedFile);
+        const path = generateStoragePath("social-mentors", selectedFile);
         finalPhotoUrl = await uploadFile(selectedFile, path, (p) => setUploadProgress(p));
       } catch (err: unknown) {
         console.error("Upload error:", err);
@@ -293,14 +248,12 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
     }
 
     try {
-      await updateMentor(mentor.id, {
+      await updateSocialMentor(mentor.id, {
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
-        bio: bio.trim(),
         linkedIn: linkedIn.trim(),
         photoUrl: finalPhotoUrl,
-        board: (mentor as Mentor & { board?: string }).board ?? "",
       });
       onSaved("Mentor updated successfully");
       onClose();
@@ -316,10 +269,10 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEEEEE]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#FFF0F2] flex items-center justify-center">
-              <User className="w-4 h-4 text-[#800020]" />
+              <Users className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Edit Mentor Details</h2>
+              <h2 className="text-sm font-black text-black">Edit Social Mentor</h2>
               <p className="text-[10px] text-[#888888]">Modify details for {mentor.name}</p>
             </div>
           </div>
@@ -329,7 +282,6 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
         </div>
 
         <div className="px-6 py-5 overflow-y-auto flex-1 space-y-4">
-          {/* Photo upload container */}
           <div className="flex items-center gap-5 p-4 rounded-xl border border-dashed border-[#DDDDDD] bg-[#FAFAFA]">
             <div
               onClick={() => photoInputRef.current?.click()}
@@ -348,7 +300,6 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
             </div>
             <div className="flex-1">
               <p className="text-xs font-bold text-black mb-0.5">Profile Photo</p>
-              <p className="text-[10px] text-[#888888] leading-relaxed mb-2">Click avatar to select new photo</p>
               <button
                 type="button"
                 disabled={uploading}
@@ -368,71 +319,28 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
 
           <div>
             <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Full Name *</label>
-            <input
-              type="text"
-              className={`cms-input w-full ${errors.name ? "border-red-300 bg-red-50" : ""}`}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <input type="text" className={`cms-input w-full ${errors.name ? "border-red-300 bg-red-50" : ""}`}
+              value={name} onChange={(e) => setName(e.target.value)} />
             {errors.name && <p className="text-[10px] text-red-500 mt-1">{errors.name}</p>}
           </div>
 
           <div className="grid grid-cols-[1fr_90px] gap-3">
             <div>
               <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Role *</label>
-              <input
-                type="text"
-                className={`cms-input w-full ${errors.role ? "border-red-300 bg-red-50" : ""}`}
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              />
+              <input type="text" className={`cms-input w-full ${errors.role ? "border-red-300 bg-red-50" : ""}`}
+                value={role} onChange={(e) => setRole(e.target.value)} />
               {errors.role && <p className="text-[10px] text-red-500 mt-1">{errors.role}</p>}
             </div>
             <div>
               <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Initials</label>
-              <input
-                type="text"
-                className="cms-input w-full text-center font-bold"
-                value={initials}
-                onChange={(e) => setInitials(e.target.value.toUpperCase())}
-              />
+              <input type="text" className="cms-input w-full text-center font-bold"
+                value={initials} onChange={(e) => setInitials(e.target.value.toUpperCase())} />
             </div>
           </div>
 
           <div>
-            <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Board / Group</label>
-            <select
-              className="cms-input w-full"
-              defaultValue={(mentor as Mentor & { board?: string }).board ?? ""}
-              onChange={async (e) => {
-                try { await updateMentor(mentor.id, { board: e.target.value } as Partial<Omit<Mentor, "id">>); } catch {}
-              }}
-            >
-              <option value="Advisory Board">Advisory Board</option>
-              <option value="Executive Board">Executive Board</option>
-              <option value="Extended Mentors">Extended Mentors</option>
-              <option value="">Ungrouped</option>
-            </select>
-          </div>
-
-          <div>
             <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">LinkedIn URL</label>
-            <input
-              type="url"
-              className="cms-input w-full"
-              value={linkedIn}
-              onChange={(e) => setLinkedIn(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Bio</label>
-            <textarea
-              className="cms-input w-full resize-none leading-relaxed"
-              rows={3}
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
+            <input type="url" className="cms-input w-full" value={linkedIn} onChange={(e) => setLinkedIn(e.target.value)} />
           </div>
         </div>
 
@@ -492,7 +400,6 @@ interface OrderInputProps {
 function OrderInput({ mentorId, initialOrder, maxOrder, onCommit }: OrderInputProps) {
   const [localVal, setLocalVal] = useState(String(initialOrder));
 
-  // Sync if parent order changes from Firestore (e.g. after another card saves)
   useEffect(() => {
     setLocalVal(String(initialOrder));
   }, [initialOrder]);
@@ -504,7 +411,7 @@ function OrderInput({ mentorId, initialOrder, maxOrder, onCommit }: OrderInputPr
       setLocalVal(String(clamped));
       onCommit(clamped);
     } else {
-      setLocalVal(String(initialOrder)); // revert invalid
+      setLocalVal(String(initialOrder));
     }
   };
 
@@ -542,38 +449,21 @@ function OrderInput({ mentorId, initialOrder, maxOrder, onCommit }: OrderInputPr
   );
 }
 
-export default function MentorsPage() {
-  const [mentors, setMentors]             = useState<Mentor[]>([]);
-  const [dbMentors, setDbMentors]         = useState<Mentor[]>([]);
-  const dbMentorsRef                      = useRef<Mentor[]>([]);
-  const [loading, setLoading]             = useState(true);
-  const [saving, setSaving]               = useState<string | null>(null);
-  const [toast, setToast]                 = useState<{ msg: string; type: "success" | "error" } | null>(null);
-  const [showAddModal, setShowAddModal]   = useState(false);
-  const [editTarget, setEditTarget]       = useState<Mentor | null>(null);
-  const [deleteTarget, setDeleteTarget]   = useState<Mentor | null>(null);
-  const [deleting, setDeleting]           = useState(false);
+export default function SocialMentorsPage() {
+  const [mentors, setMentors]               = useState<SocialMentor[]>([]);
+  const [dbMentors, setDbMentors]           = useState<SocialMentor[]>([]);
+  const [loading, setLoading]               = useState(true);
+  const [saving, setSaving]                 = useState<string | null>(null);
+  const [toast, setToast]                   = useState<{ msg: string; type: "success" | "error" } | null>(null);
+  const [showAddModal, setShowAddModal]     = useState(false);
+  const [editTarget, setEditTarget]         = useState<SocialMentor | null>(null);
+  const [deleteTarget, setDeleteTarget]     = useState<SocialMentor | null>(null);
+  const [deleting, setDeleting]             = useState(false);
 
   useEffect(() => {
-    const unsub = subscribeMentors((data) => {
+    const unsub = subscribeSocialMentors((data) => {
+      setMentors(data);
       setDbMentors(data);
-      setMentors((prevLocal) => {
-        return data.map((dbM) => {
-          const localM = prevLocal.find((l) => l.id === dbM.id);
-          const oldDbM = dbMentorsRef.current.find((d) => d.id === dbM.id);
-          if (localM && oldDbM) {
-            const isActiveDirty = localM.active !== oldDbM.active;
-            const isOrderDirty = localM.order !== oldDbM.order;
-            return {
-              ...dbM,
-              active: isActiveDirty ? localM.active : dbM.active,
-              order: isOrderDirty ? localM.order : dbM.order,
-            };
-          }
-          return dbM;
-        });
-      });
-      dbMentorsRef.current = data;
       setLoading(false);
     });
     return () => unsub();
@@ -584,18 +474,18 @@ export default function MentorsPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleUpdate = (id: string, field: keyof Mentor, value: any) => {
+  const handleUpdate = (id: string, field: keyof SocialMentor, value: any) => {
     setMentors((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   };
 
-  const handleSaveFooter = async (mentor: Mentor) => {
+  const handleSaveFooter = async (mentor: SocialMentor) => {
     setSaving(mentor.id);
     try {
-      await updateMentor(mentor.id, {
+      await updateSocialMentor(mentor.id, {
         order: mentor.order ?? 0,
         active: mentor.active ?? false,
       });
-      // Update local db copy directly
+      // Update local db copy
       setDbMentors((prev) => prev.map((m) => m.id === mentor.id ? mentor : m));
       showToast("Mentor status & order saved");
     } catch (err: unknown) {
@@ -608,7 +498,7 @@ export default function MentorsPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await deleteMentor(deleteTarget.id);
+      await deleteSocialMentor(deleteTarget.id);
       showToast("Mentor deleted");
     } catch (err: unknown) {
       showToast((err as Error).message, "error");
@@ -634,9 +524,9 @@ export default function MentorsPage() {
     );
 
     try {
-      await updateMentor(mentorId, { order: newOrder });
+      await updateSocialMentor(mentorId, { order: newOrder });
       if (swapping) {
-        await updateMentor(swapping.id, { order: oldOrder });
+        await updateSocialMentor(swapping.id, { order: oldOrder });
         showToast(`#${oldOrder + 1} ↔ #${newOrder + 1} swapped`);
       } else {
         showToast(`Moved to position #${newOrder + 1}`);
@@ -646,38 +536,9 @@ export default function MentorsPage() {
     }
   };
 
-  // Group mentors by board
-  type MentorWithBoard = Mentor & { board?: string };
-  const groups: { label: string; color: string; badge: string; items: MentorWithBoard[] }[] = [
-    {
-      label: "Advisory Board",
-      color: "#800020",
-      badge: "bg-[#FFF0F3] text-[#800020] border-[#FECDD3]",
-      items: (mentors as MentorWithBoard[]).filter((m) => m.board === "Advisory Board"),
-    },
-    {
-      label: "Executive Board",
-      color: "#1E40AF",
-      badge: "bg-blue-50 text-blue-700 border-blue-100",
-      items: (mentors as MentorWithBoard[]).filter((m) => m.board === "Executive Board"),
-    },
-    {
-      label: "Extended Mentors",
-      color: "#065F46",
-      badge: "bg-emerald-50 text-emerald-700 border-emerald-100",
-      items: (mentors as MentorWithBoard[]).filter((m) => m.board === "Extended Mentors" || (!m.board && m.id.startsWith("em-"))),
-    },
-    {
-      label: "Ungrouped",
-      color: "#555555",
-      badge: "bg-gray-50 text-gray-600 border-gray-200",
-      items: (mentors as MentorWithBoard[]).filter((m) => !m.board && !m.id.startsWith("em-")),
-    },
-  ].filter((g) => g.items.length > 0);
-
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "var(--cms-bg)" }}>
-      <Topbar title="Mentors & Board Members" breadcrumb="Mentors" />
+      <Topbar title="Social Innovation Mentors" breadcrumb="Social Mentors" />
 
       {toast && (
         <div className={`fixed top-5 right-5 z-[60] flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold animate-fade-in border ${
@@ -689,7 +550,7 @@ export default function MentorsPage() {
       )}
 
       {showAddModal && (
-        <AddMentorModal
+        <AddSocialMentorModal
           defaultOrder={mentors.length}
           onClose={() => setShowAddModal(false)}
           onCreated={(msg) => showToast(msg)}
@@ -697,7 +558,7 @@ export default function MentorsPage() {
       )}
 
       {editTarget && (
-        <EditMentorModal
+        <EditSocialMentorModal
           mentor={editTarget}
           onClose={() => setEditTarget(null)}
           onSaved={(msg) => showToast(msg)}
@@ -716,9 +577,9 @@ export default function MentorsPage() {
       <main className="flex-1 px-8 py-8 space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-black text-black tracking-tight">Mentors &amp; Board Members</h1>
+            <h1 className="text-2xl font-black text-black tracking-tight">Social Innovation Mentors</h1>
             <p className="text-xs text-[#666666] mt-1">
-              {loading ? "Loading…" : `${mentors.length} total · Advisory Board · Executive Board · Extended Mentors`}
+              {loading ? "Loading…" : `${mentors.length} total mentors`}
             </p>
           </div>
           <button
@@ -745,148 +606,125 @@ export default function MentorsPage() {
         ) : mentors.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 cms-card">
             <div className="w-16 h-16 rounded-2xl bg-[#FFF0F2] flex items-center justify-center mb-4">
-              <User className="w-7 h-7 text-[#800020]" />
+              <Users className="w-7 h-7 text-[#800020]" />
             </div>
-            <h3 className="text-base font-bold text-black mb-1">No mentors yet</h3>
+            <h3 className="text-base font-bold text-black mb-1">No social mentors yet</h3>
             <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#800020" }}>
               <Plus className="w-4 h-4" /> Add First Mentor
             </button>
           </div>
         ) : (
-          <div className="space-y-10">
-            {groups.map((group) => (
-              <div key={group.label}>
-                {/* Board section header */}
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="h-px flex-1 bg-[#EEEEEE]" />
-                  <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border text-xs font-black uppercase tracking-widest" style={{ borderColor: group.color + "40", background: group.color + "08", color: group.color }}>
-                    <span className="w-2 h-2 rounded-full" style={{ background: group.color }} />
-                    {group.label}
-                    <span className="ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold" style={{ background: group.color + "18" }}>{group.items.length}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+            {mentors.map((mentor) => {
+              const dbMentor = dbMentors.find((m) => m.id === mentor.id);
+              const hasUnsavedChanges = dbMentor
+                ? dbMentor.active !== mentor.active || dbMentor.order !== mentor.order
+                : false;
+              return (
+                <div
+                  key={mentor.id}
+                  id={`social-mentor-${mentor.id}`}
+                  className={`bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col ${
+                    hasUnsavedChanges
+                      ? "border-amber-400 ring-2 ring-amber-400/10 shadow-amber-100"
+                      : "border-[#D8D8D8] hover:border-[#C0C0C0]"
+                  }`}
+                >
+                  {/* Card Header */}
+                  <div className="px-5 pt-5 pb-4 flex items-start gap-4 border-b border-[#F5F5F5] relative">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#EEEEEE] bg-[#FFF0F2] flex items-center justify-center">
+                        {mentor.photoUrl ? (
+                          <img src={mentor.photoUrl} alt={mentor.name ?? ""} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-lg font-black text-[#800020]">
+                            {mentor.initials || (mentor.name ?? "?").substring(0, 2).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0 pr-8">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                          mentor.active ? "bg-green-50 text-green-700 border border-green-100" : "bg-[#F5F5F5] text-[#888888] border border-[#EEEEEE]"
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${mentor.active ? "bg-green-500" : "bg-[#CCCCCC]"}`} />
+                          {mentor.active ? "Active" : "Inactive"}
+                        </span>
+                        {hasUnsavedChanges && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
+                            Unsaved
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm font-black text-black truncate">{mentor.name || "Unnamed Mentor"}</p>
+                      <p className="text-xs text-[#888888] truncate">{mentor.role || "No role set"}</p>
+                    </div>
+                    <button
+                      onClick={() => setEditTarget(mentor)}
+                      className="absolute top-5 right-5 w-8 h-8 rounded-xl border border-[#EEEEEE] bg-white text-[#666666] hover:text-[#800020] hover:border-[#800020]/20 flex items-center justify-center transition-all shadow-xs"
+                      title="Edit mentor profile"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="h-px flex-1 bg-[#EEEEEE]" />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                  {group.items.map((mentor) => {
-                    const dbMentor = dbMentors.find((m) => m.id === mentor.id);
-                    const hasUnsavedChanges = dbMentor
-                      ? dbMentor.active !== mentor.active || dbMentor.order !== mentor.order
-                      : false;
-                    return (
-                      <div
-                        key={mentor.id}
-                        id={`mentor-${mentor.id}`}
-                        className={`bg-white rounded-2xl border shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden flex flex-col ${
+                  {/* Card Body */}
+                  <div className="px-5 py-4 space-y-4 flex-1">
+                    {mentor.linkedIn && (
+                      <div>
+                        <a href={mentor.linkedIn} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-bold text-[#475569] hover:bg-[#F1F5F9] hover:text-[#800020] transition-colors">
+                          <Link2 className="w-3.5 h-3.5" /> View LinkedIn Profile
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Footer */}
+                  <div className="px-4 py-2.5 border-t border-[#F5F5F5] bg-[#FAFAFA] flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {/* Active toggle */}
+                      <button type="button" onClick={() => handleUpdate(mentor.id, "active", !mentor.active)}
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border transition-all ${
+                          mentor.active ? "bg-green-50 text-green-700 border-green-200" : "bg-[#F5F5F5] text-[#888888] border-[#E0E0E0]"
+                        }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${mentor.active ? "bg-green-500" : "bg-[#BBBBBB]"}`} />
+                        {mentor.active ? "Active" : "Inactive"}
+                      </button>
+                      {/* Order with Up/Down buttons */}
+                      <OrderInput
+                        mentorId={mentor.id}
+                        initialOrder={mentor.order ?? 0}
+                        maxOrder={Math.max(0, mentors.length - 1)}
+                        onCommit={(newOrder) => handleMoveOrder(mentor.id, newOrder)}
+                      />
+                    </div>
+                    {/* Actions — icon-only to save space */}
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => setDeleteTarget(mentor)}
+                        title="Delete mentor"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-red-500 bg-red-50 border border-red-200 hover:bg-red-100 transition-all">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleSaveFooter(mentor)} disabled={saving === mentor.id}
+                        title="Save order & status"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-white transition-all disabled:opacity-60 ${
                           hasUnsavedChanges
-                            ? "border-amber-400 ring-2 ring-amber-400/10 shadow-amber-100"
-                            : "border-[#D8D8D8] hover:border-[#C0C0C0]"
+                            ? "bg-amber-500 hover:bg-amber-600 animate-pulse ring-2 ring-amber-300"
+                            : "bg-emerald-600 hover:bg-emerald-700"
                         }`}
                       >
-                        {/* Card Header */}
-                        <div className="px-5 pt-5 pb-4 flex items-start gap-4 border-b border-[#F5F5F5] relative">
-                          <div className="relative flex-shrink-0">
-                            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#EEEEEE] bg-[#FFF0F2] flex items-center justify-center">
-                              {mentor.photoUrl ? (
-                                <img src={mentor.photoUrl} alt={mentor.name ?? ""} className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-lg font-black" style={{ color: group.color }}>
-                                  {mentor.initials || (mentor.name ?? "?").substring(0, 2).toUpperCase()}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0 pr-8">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                                mentor.active ? "bg-green-50 text-green-700 border border-green-100" : "bg-[#F5F5F5] text-[#888888] border border-[#EEEEEE]"
-                              }`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${mentor.active ? "bg-green-500" : "bg-[#CCCCCC]"}`} />
-                                {mentor.active ? "Active" : "Inactive"}
-                              </span>
-                              {hasUnsavedChanges && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">
-                                  Unsaved
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm font-black text-black truncate">{mentor.name || "Unnamed Mentor"}</p>
-                            <p className="text-xs text-[#888888] truncate">{mentor.role || "No role set"}</p>
-                          </div>
-                          <button
-                            onClick={() => setEditTarget(mentor)}
-                            className="absolute top-5 right-5 w-8 h-8 rounded-xl border border-[#EEEEEE] bg-white text-[#666666] hover:text-[#800020] hover:border-[#800020]/20 flex items-center justify-center transition-all"
-                            title="Edit mentor profile"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        {/* Card Body */}
-                        <div className="px-5 py-4 space-y-4 flex-1">
-                          <div>
-                            <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1.5">Biography</label>
-                            <p className="text-xs text-[#555555] leading-relaxed min-h-[50px] whitespace-pre-line">
-                              {mentor.bio || <span className="text-[#BBBBBB] italic">No biography. Click Edit to add one.</span>}
-                            </p>
-                          </div>
-                          {mentor.linkedIn && (
-                            <div className="pt-1">
-                              <a href={mentor.linkedIn} target="_blank" rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs font-bold text-[#475569] hover:bg-[#F1F5F9] hover:text-[#800020] transition-colors">
-                                <Link2 className="w-3.5 h-3.5" /> View LinkedIn Profile
-                              </a>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Card Footer */}
-                        <div className="px-4 py-2.5 border-t border-[#F5F5F5] bg-[#FAFAFA] flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            {/* Active toggle */}
-                            <button type="button" onClick={() => handleUpdate(mentor.id, "active", !mentor.active)}
-                              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider border transition-all ${
-                                mentor.active ? "bg-green-50 text-green-700 border-green-200" : "bg-[#F5F5F5] text-[#888888] border-[#E0E0E0]"
-                              }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${mentor.active ? "bg-green-500" : "bg-[#BBBBBB]"}`} />
-                              {mentor.active ? "Active" : "Inactive"}
-                            </button>
-                            {/* Order with Up/Down buttons */}
-                            <OrderInput
-                              mentorId={mentor.id}
-                              initialOrder={mentor.order ?? 0}
-                              maxOrder={Math.max(0, mentors.length - 1)}
-                              onCommit={(newOrder) => handleMoveOrder(mentor.id, newOrder)}
-                            />
-                          </div>
-                          {/* Actions — icon-only to save space */}
-                          <div className="flex items-center gap-1.5">
-                            <button id={`delete-${mentor.id}`} onClick={() => setDeleteTarget(mentor)}
-                              title="Delete mentor"
-                              className="w-8 h-8 rounded-lg flex items-center justify-center text-red-500 bg-red-50 border border-red-200 hover:bg-red-100 transition-all">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button id={`save-${mentor.id}`} onClick={() => handleSaveFooter(mentor)} disabled={saving === mentor.id}
-                              title="Save order & status"
-                              className={`w-8 h-8 rounded-lg flex items-center justify-center text-white transition-all disabled:opacity-60 ${
-                                hasUnsavedChanges
-                                  ? "bg-amber-500 hover:bg-amber-600 animate-pulse ring-2 ring-amber-300"
-                                  : "bg-emerald-600 hover:bg-emerald-700"
-                              }`}
-                            >
-                              {saving === mentor.id
-                                ? <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
-                                : <Save className="w-3.5 h-3.5" />
-                              }
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                        {saving === mentor.id
+                          ? <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
+                          : <Save className="w-3.5 h-3.5" />
+                        }
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
