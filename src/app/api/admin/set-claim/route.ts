@@ -1,9 +1,9 @@
 // src/app/api/admin/set-claim/route.ts
 import { NextResponse, type NextRequest } from "next/server";
-import { adminAuth } from "@/lib/firebase-admin";
 
 export async function POST(req: NextRequest) {
   try {
+    const { adminAuth } = await import("@/lib/firebase-admin");
     const body = await req.json();
     const { targetEmail, targetUid, isAdmin = true } = body;
 

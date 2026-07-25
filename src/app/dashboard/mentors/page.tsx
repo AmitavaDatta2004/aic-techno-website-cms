@@ -3,11 +3,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
-  subscribeSocialMentors,
-  addSocialMentor,
-  updateSocialMentor,
-  deleteSocialMentor,
-  SocialMentor,
+  subscribeMentors,
+  addMentor,
+  updateMentor,
+  deleteMentor,
+  Mentor,
 } from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
 import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, Users, ImagePlus, Pencil, ChevronUp, ChevronDown } from "lucide-react";
@@ -19,13 +19,13 @@ function toInitials(name: string) {
   return name.substring(0, 2).toUpperCase();
 }
 
-/* ── Add Social Mentor Modal ─────────────────────────────────────────────── */
+/* ── Add Mentor Modal ─────────────────────────────────────────────── */
 interface AddModalProps {
   defaultOrder: number;
   onClose: () => void;
   onCreated: (msg: string) => void;
 }
-function AddSocialMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
+function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
   const [name, setName]         = useState("");
   const [role, setRole]         = useState("");
   const [initials, setInitials] = useState("");
@@ -83,7 +83,7 @@ function AddSocialMentorModal({ defaultOrder, onClose, onCreated }: AddModalProp
     }
 
     try {
-      await addSocialMentor({
+      await addMentor({
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
@@ -109,7 +109,7 @@ function AddSocialMentorModal({ defaultOrder, onClose, onCreated }: AddModalProp
               <Users className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Add Social Mentor</h2>
+              <h2 className="text-sm font-black text-black">Add Mentor</h2>
               <p className="text-[10px] text-[#888888]">Fill in the details below</p>
             </div>
           </div>
@@ -192,13 +192,13 @@ function AddSocialMentorModal({ defaultOrder, onClose, onCreated }: AddModalProp
   );
 }
 
-/* ── Edit Social Mentor Modal ────────────────────────────────────────────── */
+/* ── Edit Mentor Modal ────────────────────────────────────────────── */
 interface EditModalProps {
-  mentor: SocialMentor;
+  mentor: Mentor;
   onClose: () => void;
   onSaved: (msg: string) => void;
 }
-function EditSocialMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
+function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
   const [name, setName]         = useState(mentor.name ?? "");
   const [role, setRole]         = useState(mentor.role ?? "");
   const [initials, setInitials] = useState(mentor.initials ?? "");
@@ -248,7 +248,7 @@ function EditSocialMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
     }
 
     try {
-      await updateSocialMentor(mentor.id, {
+      await updateMentor(mentor.id, {
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
@@ -272,7 +272,7 @@ function EditSocialMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
               <Users className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Edit Social Mentor</h2>
+              <h2 className="text-sm font-black text-black">Edit Mentor</h2>
               <p className="text-[10px] text-[#888888]">Modify details for {mentor.name}</p>
             </div>
           </div>
@@ -450,18 +450,18 @@ function OrderInput({ mentorId, initialOrder, maxOrder, onCommit }: OrderInputPr
 }
 
 export default function SocialMentorsPage() {
-  const [mentors, setMentors]               = useState<SocialMentor[]>([]);
-  const [dbMentors, setDbMentors]           = useState<SocialMentor[]>([]);
+  const [mentors, setMentors]               = useState<Mentor[]>([]);
+  const [dbMentors, setDbMentors]           = useState<Mentor[]>([]);
   const [loading, setLoading]               = useState(true);
   const [saving, setSaving]                 = useState<string | null>(null);
   const [toast, setToast]                   = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [showAddModal, setShowAddModal]     = useState(false);
-  const [editTarget, setEditTarget]         = useState<SocialMentor | null>(null);
-  const [deleteTarget, setDeleteTarget]     = useState<SocialMentor | null>(null);
+  const [editTarget, setEditTarget]         = useState<Mentor | null>(null);
+  const [deleteTarget, setDeleteTarget]     = useState<Mentor | null>(null);
   const [deleting, setDeleting]             = useState(false);
 
   useEffect(() => {
-    const unsub = subscribeSocialMentors((data) => {
+    const unsub = subscribeMentors((data) => {
       setMentors(data);
       setDbMentors(data);
       setLoading(false);
@@ -474,14 +474,14 @@ export default function SocialMentorsPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleUpdate = (id: string, field: keyof SocialMentor, value: any) => {
+  const handleUpdate = (id: string, field: keyof Mentor, value: any) => {
     setMentors((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   };
 
-  const handleSaveFooter = async (mentor: SocialMentor) => {
+  const handleSaveFooter = async (mentor: Mentor) => {
     setSaving(mentor.id);
     try {
-      await updateSocialMentor(mentor.id, {
+      await updateMentor(mentor.id, {
         order: mentor.order ?? 0,
         active: mentor.active ?? false,
       });
@@ -498,7 +498,7 @@ export default function SocialMentorsPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await deleteSocialMentor(deleteTarget.id);
+      await deleteMentor(deleteTarget.id);
       showToast("Mentor deleted");
     } catch (err: unknown) {
       showToast((err as Error).message, "error");
@@ -524,9 +524,9 @@ export default function SocialMentorsPage() {
     );
 
     try {
-      await updateSocialMentor(mentorId, { order: newOrder });
+      await updateMentor(mentorId, { order: newOrder });
       if (swapping) {
-        await updateSocialMentor(swapping.id, { order: oldOrder });
+        await updateMentor(swapping.id, { order: oldOrder });
         showToast(`#${oldOrder + 1} ↔ #${newOrder + 1} swapped`);
       } else {
         showToast(`Moved to position #${newOrder + 1}`);
@@ -538,7 +538,7 @@ export default function SocialMentorsPage() {
 
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "var(--cms-bg)" }}>
-      <Topbar title="Social Innovation Mentors" breadcrumb="Social Mentors" />
+      <Topbar title="Social Innovation Mentors" breadcrumb="Mentors" />
 
       {toast && (
         <div className={`fixed top-5 right-5 z-[60] flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold animate-fade-in border ${
@@ -550,7 +550,7 @@ export default function SocialMentorsPage() {
       )}
 
       {showAddModal && (
-        <AddSocialMentorModal
+        <AddMentorModal
           defaultOrder={mentors.length}
           onClose={() => setShowAddModal(false)}
           onCreated={(msg) => showToast(msg)}
@@ -558,7 +558,7 @@ export default function SocialMentorsPage() {
       )}
 
       {editTarget && (
-        <EditSocialMentorModal
+        <EditMentorModal
           mentor={editTarget}
           onClose={() => setEditTarget(null)}
           onSaved={(msg) => showToast(msg)}

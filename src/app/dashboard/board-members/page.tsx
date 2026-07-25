@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Topbar } from "@/components/cms/Topbar";
-import { subscribeMentors, addMentor, updateMentor, deleteMentor, Mentor } from "@/lib/firestore";
+import { subscribeBoardMembers, addBoardMember, updateBoardMember, deleteBoardMember, BoardMember } from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
 import { Link2, Trash2, Save, Camera, Plus, CheckCircle2, XCircle, X, AlertTriangle, User, ImagePlus, Pencil, ChevronUp, ChevronDown } from "lucide-react";
 
@@ -16,13 +16,13 @@ function toInitials(name: string) {
 const BOARD_OPTIONS = ["Advisory Board", "Executive Board", "Extended Mentors", ""] as const;
 type BoardOption = typeof BOARD_OPTIONS[number];
 
-/* ── Add Mentor Modal ────────────────────────────────────────────────────── */
+/* ── Add BoardMember Modal ────────────────────────────────────────────────────── */
 interface AddModalProps {
   defaultOrder: number;
   onClose: () => void;
   onCreated: (msg: string) => void;
 }
-function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
+function AddBoardMemberModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
   const [name, setName]         = useState("");
   const [role, setRole]         = useState("");
   const [initials, setInitials] = useState("");
@@ -67,7 +67,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
       setUploading(true);
       setUploadProgress(0);
       try {
-        const path = generateStoragePath("mentors", selectedFile);
+        const path = generateStoragePath("boardMembers", selectedFile);
         uploadedPhotoUrl = await uploadFile(selectedFile, path, (p) => setUploadProgress(p));
       } catch (err: unknown) {
         console.error("Upload error:", err);
@@ -81,7 +81,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
     }
 
     try {
-      await addMentor({
+      await addBoardMember({
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
@@ -92,7 +92,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
         order,
         active,
       });
-      onCreated("Mentor added successfully");
+      onCreated("BoardMember added successfully");
       onClose();
     } catch (err: unknown) {
       setSaving(false);
@@ -109,7 +109,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
               <User className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Add New Mentor</h2>
+              <h2 className="text-sm font-black text-black">Add New BoardMember</h2>
               <p className="text-[10px] text-[#888888]">Fill in the details below</p>
             </div>
           </div>
@@ -228,7 +228,7 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
         <div className="px-6 py-4 border-t border-[#EEEEEE] bg-[#FAFAFA] rounded-b-2xl flex items-center justify-end gap-3">
           <button onClick={onClose} className="px-4 py-2 rounded-xl text-xs font-bold text-[#666666] bg-white border border-[#E0E0E0]">Cancel</button>
           <button onClick={handleSubmit} disabled={saving} className="flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold text-white" style={{ background: "#800020" }}>
-            {saving ? "Creating…" : "Create Mentor"}
+            {saving ? "Creating…" : "Create BoardMember"}
           </button>
         </div>
       </div>
@@ -236,13 +236,13 @@ function AddMentorModal({ defaultOrder, onClose, onCreated }: AddModalProps) {
   );
 }
 
-/* ── Edit Mentor Modal ───────────────────────────────────────────────────── */
+/* ── Edit BoardMember Modal ───────────────────────────────────────────────────── */
 interface EditModalProps {
-  mentor: Mentor;
+  mentor: BoardMember;
   onClose: () => void;
   onSaved: (msg: string) => void;
 }
-function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
+function EditBoardMemberModal({ mentor, onClose, onSaved }: EditModalProps) {
   const [name, setName]         = useState(mentor.name ?? "");
   const [role, setRole]         = useState(mentor.role ?? "");
   const [initials, setInitials] = useState(mentor.initials ?? "");
@@ -279,7 +279,7 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
       setUploading(true);
       setUploadProgress(0);
       try {
-        const path = generateStoragePath("mentors", selectedFile);
+        const path = generateStoragePath("boardMembers", selectedFile);
         finalPhotoUrl = await uploadFile(selectedFile, path, (p) => setUploadProgress(p));
       } catch (err: unknown) {
         console.error("Upload error:", err);
@@ -293,16 +293,16 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
     }
 
     try {
-      await updateMentor(mentor.id, {
+      await updateBoardMember(mentor.id, {
         name: name.trim(),
         role: role.trim(),
         initials: initials.trim() || toInitials(name),
         bio: bio.trim(),
         linkedIn: linkedIn.trim(),
         photoUrl: finalPhotoUrl,
-        board: (mentor as Mentor & { board?: string }).board ?? "",
+        board: (mentor as BoardMember & { board?: string }).board ?? "",
       });
-      onSaved("Mentor updated successfully");
+      onSaved("BoardMember updated successfully");
       onClose();
     } catch (err: unknown) {
       setSaving(false);
@@ -319,7 +319,7 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
               <User className="w-4 h-4 text-[#800020]" />
             </div>
             <div>
-              <h2 className="text-sm font-black text-black">Edit Mentor Details</h2>
+              <h2 className="text-sm font-black text-black">Edit BoardMember Details</h2>
               <p className="text-[10px] text-[#888888]">Modify details for {mentor.name}</p>
             </div>
           </div>
@@ -403,9 +403,9 @@ function EditMentorModal({ mentor, onClose, onSaved }: EditModalProps) {
             <label className="block text-[9px] font-extrabold uppercase tracking-[1.5px] text-[#AAAAAA] mb-1">Board / Group</label>
             <select
               className="cms-input w-full"
-              defaultValue={(mentor as Mentor & { board?: string }).board ?? ""}
+              defaultValue={(mentor as BoardMember & { board?: string }).board ?? ""}
               onChange={async (e) => {
-                try { await updateMentor(mentor.id, { board: e.target.value } as Partial<Omit<Mentor, "id">>); } catch {}
+                try { await updateBoardMember(mentor.id, { board: e.target.value } as Partial<Omit<BoardMember, "id">>); } catch {}
               }}
             >
               <option value="Advisory Board">Advisory Board</option>
@@ -463,7 +463,7 @@ function DeleteConfirmModal({ mentorName, onCancel, onConfirm, deleting }: Delet
             <AlertTriangle className="w-5 h-5 text-red-500" />
           </div>
           <div>
-            <h3 className="text-sm font-black text-black">Delete Mentor</h3>
+            <h3 className="text-sm font-black text-black">Delete BoardMember</h3>
             <p className="text-xs text-[#666666] mt-1 leading-relaxed">
               Are you sure you want to delete <span className="font-bold text-black">{mentorName}</span>? This action cannot be undone.
             </p>
@@ -543,19 +543,19 @@ function OrderInput({ mentorId, initialOrder, maxOrder, onCommit }: OrderInputPr
 }
 
 export default function MentorsPage() {
-  const [mentors, setMentors]             = useState<Mentor[]>([]);
-  const [dbMentors, setDbMentors]         = useState<Mentor[]>([]);
-  const dbMentorsRef                      = useRef<Mentor[]>([]);
+  const [mentors, setMentors]             = useState<BoardMember[]>([]);
+  const [dbMentors, setDbMentors]         = useState<BoardMember[]>([]);
+  const dbMentorsRef                      = useRef<BoardMember[]>([]);
   const [loading, setLoading]             = useState(true);
   const [saving, setSaving]               = useState<string | null>(null);
   const [toast, setToast]                 = useState<{ msg: string; type: "success" | "error" } | null>(null);
   const [showAddModal, setShowAddModal]   = useState(false);
-  const [editTarget, setEditTarget]       = useState<Mentor | null>(null);
-  const [deleteTarget, setDeleteTarget]   = useState<Mentor | null>(null);
+  const [editTarget, setEditTarget]       = useState<BoardMember | null>(null);
+  const [deleteTarget, setDeleteTarget]   = useState<BoardMember | null>(null);
   const [deleting, setDeleting]           = useState(false);
 
   useEffect(() => {
-    const unsub = subscribeMentors((data) => {
+    const unsub = subscribeBoardMembers((data) => {
       setDbMentors(data);
       setMentors((prevLocal) => {
         return data.map((dbM) => {
@@ -584,20 +584,20 @@ export default function MentorsPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const handleUpdate = (id: string, field: keyof Mentor, value: any) => {
+  const handleUpdate = (id: string, field: keyof BoardMember, value: any) => {
     setMentors((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   };
 
-  const handleSaveFooter = async (mentor: Mentor) => {
+  const handleSaveFooter = async (mentor: BoardMember) => {
     setSaving(mentor.id);
     try {
-      await updateMentor(mentor.id, {
+      await updateBoardMember(mentor.id, {
         order: mentor.order ?? 0,
         active: mentor.active ?? false,
       });
       // Update local db copy directly
       setDbMentors((prev) => prev.map((m) => m.id === mentor.id ? mentor : m));
-      showToast("Mentor status & order saved");
+      showToast("BoardMember status & order saved");
     } catch (err: unknown) {
       showToast((err as Error).message, "error");
     }
@@ -608,8 +608,8 @@ export default function MentorsPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      await deleteMentor(deleteTarget.id);
-      showToast("Mentor deleted");
+      await deleteBoardMember(deleteTarget.id);
+      showToast("BoardMember deleted");
     } catch (err: unknown) {
       showToast((err as Error).message, "error");
     }
@@ -634,9 +634,9 @@ export default function MentorsPage() {
     );
 
     try {
-      await updateMentor(mentorId, { order: newOrder });
+      await updateBoardMember(mentorId, { order: newOrder });
       if (swapping) {
-        await updateMentor(swapping.id, { order: oldOrder });
+        await updateBoardMember(swapping.id, { order: oldOrder });
         showToast(`#${oldOrder + 1} ↔ #${newOrder + 1} swapped`);
       } else {
         showToast(`Moved to position #${newOrder + 1}`);
@@ -647,7 +647,7 @@ export default function MentorsPage() {
   };
 
   // Group mentors by board
-  type MentorWithBoard = Mentor & { board?: string };
+  type MentorWithBoard = BoardMember & { board?: string };
   const groups: { label: string; color: string; badge: string; items: MentorWithBoard[] }[] = [
     {
       label: "Advisory Board",
@@ -689,7 +689,7 @@ export default function MentorsPage() {
       )}
 
       {showAddModal && (
-        <AddMentorModal
+        <AddBoardMemberModal
           defaultOrder={mentors.length}
           onClose={() => setShowAddModal(false)}
           onCreated={(msg) => showToast(msg)}
@@ -697,7 +697,7 @@ export default function MentorsPage() {
       )}
 
       {editTarget && (
-        <EditMentorModal
+        <EditBoardMemberModal
           mentor={editTarget}
           onClose={() => setEditTarget(null)}
           onSaved={(msg) => showToast(msg)}
@@ -726,7 +726,7 @@ export default function MentorsPage() {
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5"
             style={{ background: "linear-gradient(135deg, #800020 0%, #5B0017 100%)" }}
           >
-            <Plus className="w-4 h-4" /> Add Mentor
+            <Plus className="w-4 h-4" /> Add BoardMember
           </button>
         </div>
 
@@ -749,7 +749,7 @@ export default function MentorsPage() {
             </div>
             <h3 className="text-base font-bold text-black mb-1">No mentors yet</h3>
             <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white" style={{ background: "#800020" }}>
-              <Plus className="w-4 h-4" /> Add First Mentor
+              <Plus className="w-4 h-4" /> Add First BoardMember
             </button>
           </div>
         ) : (
@@ -810,7 +810,7 @@ export default function MentorsPage() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm font-black text-black truncate">{mentor.name || "Unnamed Mentor"}</p>
+                            <p className="text-sm font-black text-black truncate">{mentor.name || "Unnamed BoardMember"}</p>
                             <p className="text-xs text-[#888888] truncate">{mentor.role || "No role set"}</p>
                           </div>
                           <button
