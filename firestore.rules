@@ -40,6 +40,14 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Pages ─────────────────────────────────────────────────────────
+    // Public read (dynamic template site fetches this), admin-only write
+    
+    match /pages/{pageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ─── Careers ───────────────────────────────────────────────────────
     // Public read, admin-only write
     

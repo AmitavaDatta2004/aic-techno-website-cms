@@ -18,6 +18,7 @@ import {
   ExternalLink,
   LayoutGrid,
   Rocket,
+  FileText,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "DYNAMIC CONTENT",
     items: [
+      { href: "/dashboard/pages",         label: "Pages CMS",     icon: FileText,       badge: "Dynamic" },
       { href: "/dashboard/board-members", label: "Board Members", icon: Users,          badge: "Dynamic" },
       { href: "/dashboard/mentors",       label: "Mentors",       icon: HeartHandshake, badge: "Dynamic" },
       { href: "/dashboard/careers",       label: "Careers",       icon: Briefcase,      badge: "Dynamic" },

@@ -108,6 +108,20 @@ export interface MediaFile {
   uploadedAt?: Timestamp;
 }
 
+export interface CustomPage {
+  id: string;
+  title: string;
+  slug: string;
+  bannerImage?: string;
+  content: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  published: boolean;
+  order: number;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 function snapToArray<T>(snap: QuerySnapshot<DocumentData>): T[] {
@@ -599,3 +613,45 @@ export async function saveApplyContent(
     { merge: true }
   );
 }
+
+// ─── Custom Pages ─────────────────────────────────────────────────────────────
+
+const PAGES = "pages";
+
+export async function getPages(): Promise<CustomPage[]> {
+  const snap = await getDocs(collection(db, PAGES));
+  const items = snapToArray<CustomPage>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+export function subscribePages(cb: (pages: CustomPage[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, PAGES), (snap) => {
+    const items = snapToArray<CustomPage>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
+}
+
+export async function addPage(data: Omit<CustomPage, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, PAGES), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updatePage(
+  id: string,
+  data: Partial<Omit<CustomPage, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, PAGES, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deletePage(id: string): Promise<void> {
+  await deleteDoc(doc(db, PAGES, id));
+}
+
