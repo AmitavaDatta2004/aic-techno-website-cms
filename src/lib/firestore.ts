@@ -108,20 +108,6 @@ export interface MediaFile {
   uploadedAt?: Timestamp;
 }
 
-export interface CustomPage {
-  id: string;
-  title: string;
-  slug: string;
-  bannerImage?: string;
-  content: string;
-  seoTitle?: string;
-  metaDescription?: string;
-  published: boolean;
-  order: number;
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
-}
-
 // ─── Helper ───────────────────────────────────────────────────────────────────
 
 function snapToArray<T>(snap: QuerySnapshot<DocumentData>): T[] {
@@ -614,9 +600,51 @@ export async function saveApplyContent(
   );
 }
 
-// ─── Custom Pages ─────────────────────────────────────────────────────────────
+// ─── Custom Pages (Visual Page Builder) ──────────────────────────────────────
+
+export interface PageMeta {
+  title: string;
+  description: string;
+  ogImage?: string;
+}
+
+export interface PageComponent {
+  id: string;         // stable unique ID like "comp-1720000001"
+  type: string;       // component type: "hero" | "about" | "features" | ...
+  order: number;      // 0-based render order
+  visible: boolean;   // if false, the component is hidden but not deleted
+  props: Record<string, unknown>; // component-specific editable properties
+}
+
+export interface CustomPage {
+  id: string;
+  slug: string;          // URL slug, e.g. "about-us" (unique)
+  title: string;         // display title shown in CMS
+  template: string;      // template used: "landing" | "startup" | "event" | etc.
+  status: "draft" | "published";
+  meta: PageMeta;
+  components: PageComponent[];
+  order?: number;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  publishedAt?: Timestamp | null;
+}
+
 
 const PAGES = "pages";
+
+export async function getPage(id: string): Promise<CustomPage | null> {
+  const snap = await getDoc(doc(db, PAGES, id));
+  return snap.exists() ? ({ id: snap.id, ...snap.data() } as CustomPage) : null;
+}
+
+export async function publishPage(id: string): Promise<void> {
+  await updateDoc(doc(db, PAGES, id), {
+    status: "published",
+    publishedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
 
 export async function getPages(): Promise<CustomPage[]> {
   const snap = await getDocs(collection(db, PAGES));

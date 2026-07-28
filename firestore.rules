@@ -80,6 +80,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Pages (Visual Page Builder) ───────────────────────────────────────────
+    // Public read so that page.html on HostGator can fetch published pages.
+    // Admin-only write.
+    
+    match /pages/{pageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ─── Deny everything else ──────────────────────────────────────────
     // Any collection not explicitly listed above is denied by default
   }
