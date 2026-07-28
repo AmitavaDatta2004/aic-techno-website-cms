@@ -1,11 +1,10 @@
 "use client";
 // src/app/dashboard/layout.tsx
 // The CMS shell — sidebar + main content area.
-// Client component because it uses useAuth to protect the route client-side
-// (proxy.ts is the first gate; this is the second, authoritative check).
+// For the Visual Page Builder (/dashboard/pages/[id]), it renders full-screen without the outer sidebar.
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Sidebar } from "@/components/cms/Sidebar";
 
@@ -16,6 +15,7 @@ export default function DashboardLayout({
 }) {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (loading) return;
@@ -50,6 +50,17 @@ export default function DashboardLayout({
 
   // Don't render children until auth is confirmed
   if (!user || !isAdmin) return null;
+
+  // Check if we are inside the Visual Page Editor (/dashboard/pages/[id])
+  const isPageEditor = pathname ? /^\/dashboard\/pages\/[^/]+$/.test(pathname) : false;
+
+  if (isPageEditor) {
+    return (
+      <div className="h-screen w-screen overflow-hidden bg-[#F8F9FA]">
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex" style={{ background: "var(--cms-bg)" }}>

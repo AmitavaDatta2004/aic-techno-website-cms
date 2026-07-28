@@ -692,12 +692,10 @@ export default function MentorsPage() {
                           src={mentor.photoUrl}
                           alt={mentor.name}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = "none";
-                          }}
                         />
-                      ) : null}
-                      <span className="mentor-initials">{mentor.initials || toInitials(mentor.name)}</span>
+                      ) : (
+                        <span>{mentor.initials || toInitials(mentor.name)}</span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-1">

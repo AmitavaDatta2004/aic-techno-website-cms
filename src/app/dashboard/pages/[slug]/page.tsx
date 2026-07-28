@@ -11,13 +11,17 @@ import {
   Globe,
   ExternalLink,
   Eye,
+  EyeOff,
   Check,
   AlertCircle,
+  PanelLeft,
+  PanelRight,
 } from "lucide-react";
 import {
   getPage,
   updatePage,
   publishPage,
+  unpublishPage,
   type CustomPage,
   type PageComponent,
 } from "@/lib/firestore";
@@ -38,6 +42,8 @@ export default function PageEditor({
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showLeftPanel, setShowLeftPanel] = useState(true);
+  const [showRightPanel, setShowRightPanel] = useState(true);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -199,6 +205,21 @@ export default function PageEditor({
     }
   }
 
+  async function handleUnpublish() {
+    if (!page) return;
+    setPublishing(true);
+    try {
+      await unpublishPage(page.id);
+      setPage((prev) => (prev ? { ...prev, status: "draft" } : null));
+      showToast("Page unpublished (hidden from live site)");
+    } catch (err) {
+      console.error(err);
+      showToast("Unpublish failed", "error");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]">
@@ -240,31 +261,58 @@ export default function PageEditor({
           </div>
         </div>
 
-        {/* Center: Device preview toggle or info */}
-        <div className="hidden md:flex items-center gap-2 bg-[#F1F5F9] p-1 rounded-lg text-[11px] font-bold text-[#64748B]">
-          <span className="px-2.5 py-1 rounded bg-white shadow-xs text-[#0F172A]">
-            🖥️ Desktop Canvas
+        {/* Center: Controls & View Toggles */}
+        <div className="hidden md:flex items-center gap-1.5 bg-[#F1F5F9] p-1 rounded-lg text-[11px] font-bold text-[#64748B]">
+          <button
+            onClick={() => setShowLeftPanel((prev) => !prev)}
+            className={`p-1.5 rounded transition-all flex items-center gap-1 ${
+              showLeftPanel
+                ? "bg-white shadow-xs text-[#0F172A]"
+                : "text-[#94A3B8] hover:text-[#0F172A]"
+            }`}
+            title="Toggle Component Library"
+          >
+            <PanelLeft className="w-3.5 h-3.5" />
+            <span>Library</span>
+          </button>
+
+          <span className="w-px h-3 bg-[#CBD5E1]" />
+
+          <span className="px-2 py-0.5 text-[#0F172A]">
+            🖥️ Desktop Canvas ({page.components.length})
           </span>
-          <span className="px-2 text-[#94A3B8] font-normal">
-            {page.components.length} components
-          </span>
+
+          <span className="w-px h-3 bg-[#CBD5E1]" />
+
+          <button
+            onClick={() => setShowRightPanel((prev) => !prev)}
+            className={`p-1.5 rounded transition-all flex items-center gap-1 ${
+              showRightPanel
+                ? "bg-white shadow-xs text-[#0F172A]"
+                : "text-[#94A3B8] hover:text-[#0F172A]"
+            }`}
+            title="Toggle Inspector Panel"
+          >
+            <PanelRight className="w-3.5 h-3.5" />
+            <span>Inspector</span>
+          </button>
         </div>
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Status */}
+          {/* Status Badge */}
           <span
-            className={`text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full border ${
+            className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${
               page.status === "published"
                 ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
                 : "bg-[#F1F5F9] text-[#64748B] border-[#E2E8F0]"
             }`}
           >
-            {page.status}
+            ● {page.status}
           </span>
 
           <a
-            href={`https://aic-techno.com/${page.slug}`}
+            href={`page.html?slug=${page.slug}`}
             target="_blank"
             rel="noopener noreferrer"
             className="cms-btn-secondary text-xs py-1.5 px-3"
@@ -283,61 +331,81 @@ export default function PageEditor({
             <span>{saving ? "Saving..." : "Save Draft"}</span>
           </button>
 
-          <button
-            onClick={handlePublish}
-            disabled={publishing}
-            className="cms-btn-primary text-xs py-1.5 px-3"
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>{publishing ? "Publishing..." : "Publish Live"}</span>
-          </button>
+          {/* Toggle Publish / Unpublish Button */}
+          {page.status === "published" ? (
+            <button
+              onClick={handleUnpublish}
+              disabled={publishing}
+              className="text-xs py-1.5 px-3 rounded-lg font-bold border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 transition-colors flex items-center gap-1.5"
+              title="Unpublish page (make invisible on live website)"
+            >
+              <EyeOff className="w-3.5 h-3.5 text-amber-700" />
+              <span>{publishing ? "Updating..." : "Unpublish (Draft)"}</span>
+            </button>
+          ) : (
+            <button
+              onClick={handlePublish}
+              disabled={publishing}
+              className="cms-btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
+              title="Publish page live to public website"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>{publishing ? "Publishing..." : "Publish Live"}</span>
+            </button>
+          )}
         </div>
       </header>
 
       {/* Main 3-Column Studio Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Column: Component Panel (280px) */}
-        <div className="w-64 shrink-0">
-          <ComponentPanel onAdd={handleAddComponent} />
-        </div>
+      <div className="flex-1 flex overflow-hidden w-full">
+        {/* Left Column: Component Panel (240px) */}
+        {showLeftPanel && (
+          <div className="w-60 shrink-0 border-r border-[#E5E7EB] bg-white transition-all">
+            <ComponentPanel onAdd={handleAddComponent} />
+          </div>
+        )}
 
         {/* Middle Column: Canvas (Fluid) */}
-        <Canvas
-          components={page.components}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onMoveUp={(id) => handleMove(id, -1)}
-          onMoveDown={(id) => handleMove(id, 1)}
-          onDuplicate={handleDuplicate}
-          onToggleVisibility={handleToggleVisibility}
-          onDelete={handleDelete}
-          onReorder={handleReorder}
-          onAddComponent={() => {
-            const el = document.querySelector(".w-64");
-            el?.scrollIntoView({ behavior: "smooth" });
-          }}
-        />
-
-        {/* Right Column: Properties Panel (320px) */}
-        <div className="w-80 shrink-0">
-          {selectedComp ? (
-            <PropertiesPanel
-              key={selectedComp.id}
-              component={selectedComp}
-              onChange={handleUpdateProps}
-            />
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center p-6 text-center bg-white border-l border-[#E5E7EB]">
-              <div className="text-4xl mb-2">👆</div>
-              <h4 className="text-xs font-bold text-[#0F172A] mb-1">
-                No Component Selected
-              </h4>
-              <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                Click any component block on the canvas to edit its properties, text, and images.
-              </p>
-            </div>
-          )}
+        <div className="flex-1 overflow-y-auto bg-[#F1F5F9] flex flex-col min-w-0">
+          <Canvas
+            components={page.components}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onMoveUp={(id) => handleMove(id, -1)}
+            onMoveDown={(id) => handleMove(id, 1)}
+            onDuplicate={handleDuplicate}
+            onToggleVisibility={handleToggleVisibility}
+            onDelete={handleDelete}
+            onReorder={handleReorder}
+            onAddComponent={() => {
+              if (!showLeftPanel) setShowLeftPanel(true);
+            }}
+            onUpdateProps={handleUpdateProps}
+          />
         </div>
+
+        {/* Right Column: Properties Panel (288px) */}
+        {showRightPanel && (
+          <div className="w-72 shrink-0 border-l border-[#E5E7EB] bg-white transition-all">
+            {selectedComp ? (
+              <PropertiesPanel
+                key={selectedComp.id}
+                component={selectedComp}
+                onChange={handleUpdateProps}
+              />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center p-6 text-center bg-white">
+                <div className="text-4xl mb-2">👆</div>
+                <h4 className="text-xs font-bold text-[#0F172A] mb-1">
+                  No Component Selected
+                </h4>
+                <p className="text-[11px] text-[#94A3B8] leading-relaxed">
+                  Click any component block on the canvas to edit its properties, text, and images.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Toast Notification */}

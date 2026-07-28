@@ -641,7 +641,16 @@ export async function getPage(id: string): Promise<CustomPage | null> {
 export async function publishPage(id: string): Promise<void> {
   await updateDoc(doc(db, PAGES, id), {
     status: "published",
+    published: true,
     publishedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function unpublishPage(id: string): Promise<void> {
+  await updateDoc(doc(db, PAGES, id), {
+    status: "draft",
+    published: false,
     updatedAt: serverTimestamp(),
   });
 }
