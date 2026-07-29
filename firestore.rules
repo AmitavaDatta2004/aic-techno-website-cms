@@ -4,7 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ─── Helper Functions ──────────────────────────────────────────────
-    
+
     // Check if the request is from an authenticated user
     function isAuthenticated() {
       return request.auth != null;
@@ -18,7 +18,7 @@ service cloud.firestore {
     // ─── Site Content (single documents) ───────────────────────────────
     // Documents: hero, aboutTIG, aboutAIC, settings, back2bengal, workspace, apply
     // Public read (static site fetches this), admin-only write
-    
+
     match /siteContent/{document} {
       allow read: if true;
       allow write: if isAdmin();
@@ -26,7 +26,7 @@ service cloud.firestore {
 
     // ─── Board Members ──────────────────────────────────────────────────
     // Public read (displayed on static site), admin-only write
-    
+
     match /boardMembers/{memberId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -34,7 +34,7 @@ service cloud.firestore {
 
     // ─── Mentors ────────────────────────────────────────────────────────
     // Public read (displayed on static site), admin-only write
-    
+
     match /mentors/{mentorId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -42,7 +42,7 @@ service cloud.firestore {
 
     // ─── Pages ─────────────────────────────────────────────────────────
     // Public read (dynamic template site fetches this), admin-only write
-    
+
     match /pages/{pageId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -50,7 +50,7 @@ service cloud.firestore {
 
     // ─── Careers ───────────────────────────────────────────────────────
     // Public read, admin-only write
-    
+
     match /careers/{careerId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -58,7 +58,7 @@ service cloud.firestore {
 
     // ─── Partners ──────────────────────────────────────────────────────
     // Public read, admin-only write
-    
+
     match /partners/{partnerId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -66,7 +66,7 @@ service cloud.firestore {
 
     // ─── Featured Partners ─────────────────────────────────────────────
     // Public read, admin-only write
-    
+
     match /featuredPartners/{partnerId} {
       allow read: if true;
       allow write: if isAdmin();
@@ -74,17 +74,8 @@ service cloud.firestore {
 
     // ─── Media ─────────────────────────────────────────────────────────
     // Public read (images referenced on static site), admin-only write
-    
-    match /media/{fileId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
 
-    // ─── Pages (Visual Page Builder) ───────────────────────────────────────────
-    // Public read so that page.html on HostGator can fetch published pages.
-    // Admin-only write.
-    
-    match /pages/{pageId} {
+    match /media/{fileId} {
       allow read: if true;
       allow write: if isAdmin();
     }

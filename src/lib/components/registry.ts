@@ -529,39 +529,6 @@ export const COMPONENT_REGISTRY: ComponentDef[] = [
     ],
   },
 
-  // ── 16. Footer ─────────────────────────────────────────────────────────────
-  {
-    type: "footer",
-    label: "Footer",
-    icon: "🔻",
-    category: "layout",
-    defaultProps: {
-      logo: "AIC Techno",
-      tagline: "West Bengal's First Atal Incubation Centre",
-      links: [
-        { label: "Home", url: "/" },
-        { label: "About", url: "#about" },
-        { label: "Apply", url: "#apply" },
-        { label: "Contact", url: "mailto:contact@aic-techno.com" },
-      ],
-      copyright: `© ${new Date().getFullYear()} AIC Techno Innovation and Incubation Council. All rights reserved.`,
-    },
-    fields: [
-      { key: "logo", label: "Logo Text", type: "text" },
-      { key: "tagline", label: "Tagline", type: "text" },
-      {
-        key: "links",
-        label: "Links",
-        type: "repeater",
-        repeaterAddLabel: "Add Link",
-        repeaterFields: [
-          { key: "label", label: "Link Label", type: "text" },
-          { key: "url", label: "Link URL", type: "url" },
-        ],
-      },
-      { key: "copyright", label: "Copyright Text", type: "text" },
-    ],
-  },
 
   // ── 17. Pricing / Incubation Packages ──────────────────────────────────────
   {

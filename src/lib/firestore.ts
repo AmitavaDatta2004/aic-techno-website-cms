@@ -662,6 +662,9 @@ export interface CustomPage {
   title: string;         // display title shown in CMS
   template: string;      // template used: "landing" | "startup" | "event" | etc.
   status: "draft" | "published";
+  published?: boolean;   // Firestore boolean mirror of status for query compatibility
+  showInNav?: boolean;   // if true, this page appears in the site navbar
+  navOrder?: number;     // sort order in the navbar (lower = earlier)
   meta: PageMeta;
   components: PageComponent[];
   order?: number;
@@ -695,6 +698,13 @@ export async function unpublishPage(id: string): Promise<void> {
   });
 }
 
+export async function togglePageInNav(id: string, showInNav: boolean): Promise<void> {
+  await updateDoc(doc(db, PAGES, id), {
+    showInNav,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 export async function getPages(): Promise<CustomPage[]> {
   const snap = await getDocs(collection(db, PAGES));
   const items = snapToArray<CustomPage>(snap);
@@ -711,6 +721,8 @@ export function subscribePages(cb: (pages: CustomPage[]) => void): Unsubscribe {
 
 export async function addPage(data: Omit<CustomPage, "id">): Promise<string> {
   const ref = await addDoc(collection(db, PAGES), {
+    showInNav: false,  // default: not in nav until user opts in
+    navOrder: 0,
     ...data,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),

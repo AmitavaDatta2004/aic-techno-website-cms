@@ -23,6 +23,7 @@ import {
   deletePage,
   publishPage,
   unpublishPage,
+  togglePageInNav,
   type CustomPage,
 } from "@/lib/firestore";
 import { TemplatePickerModal } from "./components/TemplatePickerModal";
@@ -77,6 +78,8 @@ interface PageCardProps {
   onDelete: () => void;
   onTogglePublish: () => void;
   toggling: boolean;
+  onToggleNav: () => void;
+  togglingNav: boolean;
 }
 
 const TEMPLATE_ICONS: Record<string, string> = {
@@ -96,6 +99,8 @@ function PageCard({
   onDelete,
   onTogglePublish,
   toggling,
+  onToggleNav,
+  togglingNav,
 }: PageCardProps) {
   const [confirming, setConfirming] = useState(false);
 
@@ -133,19 +138,44 @@ function PageCard({
         />
       </div>
 
-      {/* Meta */}
-      <div className="flex items-center gap-2 text-[10px] text-[#94A3B8] mb-4">
-        <Layout className="w-3 h-3 shrink-0" />
-        <span className="capitalize">{page.template} template</span>
-        <span>·</span>
-        <span>{page.components?.length ?? 0} components</span>
-        <span>·</span>
-        <Clock className="w-3 h-3 shrink-0" />
-        <span>
-          {page.updatedAt
-            ? new Date((page.updatedAt as unknown as { seconds: number }).seconds * 1000).toLocaleDateString()
-            : "Just now"}
-        </span>
+      {/* Meta + Nav Toggle Row */}
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex items-center gap-2 text-[10px] text-[#94A3B8]">
+          <Layout className="w-3 h-3 shrink-0" />
+          <span className="capitalize">{page.template} template</span>
+          <span>·</span>
+          <span>{page.components?.length ?? 0} components</span>
+          <span>·</span>
+          <Clock className="w-3 h-3 shrink-0" />
+          <span>
+            {page.updatedAt
+              ? new Date((page.updatedAt as unknown as { seconds: number }).seconds * 1000).toLocaleDateString()
+              : "Just now"}
+          </span>
+        </div>
+
+        {/* Show in Nav toggle — only meaningful when published */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleNav(); }}
+          disabled={togglingNav || page.status !== "published"}
+          title={page.status !== "published" ? "Publish the page first to add it to the navbar" : page.showInNav ? "Remove from navigation bar" : "Add to navigation bar"}
+          className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border transition-all shrink-0 ${
+            page.status !== "published"
+              ? "opacity-30 cursor-not-allowed bg-[#F1F5F9] text-[#94A3B8] border-[#E2E8F0]"
+              : page.showInNav
+              ? "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE] hover:bg-[#DBEAFE]"
+              : "bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0] hover:bg-[#F1F5F9] hover:text-[#475569]"
+          }`}
+        >
+          {togglingNav ? (
+            <span className="w-2.5 h-2.5 border border-current border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          )}
+          {page.showInNav ? "In Nav" : "Add to Nav"}
+        </button>
       </div>
 
       {/* Actions */}
@@ -200,6 +230,7 @@ export default function PagesListPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [togglingNavId, setTogglingNavId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -230,6 +261,20 @@ export default function PagesListPage() {
       showToast("Failed to update status", "error");
     } finally {
       setTogglingId(null);
+    }
+  }
+
+  async function handleToggleNav(page: CustomPage) {
+    setTogglingNavId(page.id);
+    try {
+      const next = !page.showInNav;
+      await togglePageInNav(page.id, next);
+      showToast(next ? `"${page.title}" added to navbar!` : `"${page.title}" removed from navbar.`);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to update nav", "error");
+    } finally {
+      setTogglingNavId(null);
     }
   }
 
@@ -331,6 +376,8 @@ export default function PagesListPage() {
                 onDelete={() => handleDelete(page)}
                 onTogglePublish={() => handleTogglePublish(page)}
                 toggling={togglingId === page.id}
+                onToggleNav={() => handleToggleNav(page)}
+                togglingNav={togglingNavId === page.id}
               />
             ))}
 

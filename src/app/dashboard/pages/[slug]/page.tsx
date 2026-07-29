@@ -22,6 +22,7 @@ import {
   updatePage,
   publishPage,
   unpublishPage,
+  togglePageInNav,
   type CustomPage,
   type PageComponent,
 } from "@/lib/firestore";
@@ -41,6 +42,7 @@ export default function PageEditor({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [togglingNav, setTogglingNav] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
@@ -246,6 +248,22 @@ export default function PageEditor({
     }
   }
 
+  async function handleToggleNav() {
+    if (!page) return;
+    setTogglingNav(true);
+    try {
+      const next = !page.showInNav;
+      await togglePageInNav(page.id, next);
+      setPage((prev) => (prev ? { ...prev, showInNav: next } : null));
+      showToast(next ? "Page added to navigation bar!" : "Page removed from navigation bar.");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to update navigation", "error");
+    } finally {
+      setTogglingNav(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]">
@@ -352,6 +370,29 @@ export default function PageEditor({
             </span>
           )}
 
+          {/* Show in Nav toggle */}
+          <button
+            onClick={handleToggleNav}
+            disabled={togglingNav || page.status !== "published"}
+            title={page.status !== "published" ? "Publish the page first to add it to the navbar" : page.showInNav ? "Remove from navigation bar" : "Add to navigation bar"}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+              page.status !== "published"
+                ? "opacity-40 cursor-not-allowed bg-[#F1F5F9] text-[#94A3B8] border-[#E2E8F0]"
+                : page.showInNav
+                ? "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE] hover:bg-[#DBEAFE]"
+                : "bg-white text-[#64748B] border-[#E2E8F0] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+            }`}
+          >
+            {togglingNav ? (
+              <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+            <span>{page.showInNav ? "In Nav ✓" : "Add to Nav"}</span>
+          </button>
+
           <a
             href={`page.html?slug=${page.slug}`}
             target="_blank"
@@ -440,14 +481,138 @@ export default function PageEditor({
                 onChange={handleUpdateProps}
               />
             ) : (
-              <div className="h-full flex flex-col items-center justify-center p-6 text-center bg-white">
-                <div className="text-4xl mb-2">👆</div>
-                <h4 className="text-xs font-bold text-[#0F172A] mb-1">
-                  No Component Selected
-                </h4>
-                <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                  Click any component block on the canvas to edit its properties, text, and images.
-                </p>
+              <div className="h-full flex flex-col bg-white overflow-y-auto">
+                <div className="px-4 py-3 border-b border-[#E5E7EB] shrink-0 bg-[#F8FAFC]">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">⚙️</span>
+                    <div>
+                      <h3 className="text-xs font-black text-[#0F172A]">Page & SEO Settings</h3>
+                      <p className="text-[10px] text-[#64748B]">Edit page title, SEO tags & nav settings</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 space-y-5 flex-1">
+                  {/* Page Title */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-1.5">
+                      Page Display Title
+                    </label>
+                    <input
+                      type="text"
+                      className="cms-input text-xs font-semibold"
+                      value={page.title}
+                      placeholder="e.g. About Us"
+                      onChange={(e) =>
+                        setPage((prev) => (prev ? { ...prev, title: e.target.value } : null))
+                      }
+                    />
+                    <p className="text-[10px] text-[#94A3B8] mt-1">Internal title shown in CMS and dashboards.</p>
+                  </div>
+
+                  {/* SEO Meta Title */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-1.5">
+                      SEO Meta Title (Browser Tab)
+                    </label>
+                    <input
+                      type="text"
+                      className="cms-input text-xs font-semibold"
+                      value={page.meta?.title ?? ""}
+                      placeholder="e.g. About Us | AIC Techno"
+                      onChange={(e) =>
+                        setPage((prev) =>
+                          prev
+                            ? { ...prev, meta: { ...prev.meta, title: e.target.value } }
+                            : null
+                        )
+                      }
+                    />
+                    <div className="flex justify-between items-center text-[10px] text-[#94A3B8] mt-1">
+                      <span>Appears in browser tabs and search results</span>
+                      <span>{(page.meta?.title ?? "").length} chars</span>
+                    </div>
+                  </div>
+
+                  {/* SEO Meta Description */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-1.5">
+                      SEO Meta Description
+                    </label>
+                    <textarea
+                      className="cms-input text-xs resize-none"
+                      rows={4}
+                      value={page.meta?.description ?? ""}
+                      placeholder="e.g. Learn more about AIC Techno Innovation Council, our mission, vision and incubation facilities."
+                      onChange={(e) =>
+                        setPage((prev) =>
+                          prev
+                            ? { ...prev, meta: { ...prev.meta, description: e.target.value } }
+                            : null
+                        )
+                      }
+                    />
+                    <div className="flex justify-between items-center text-[10px] text-[#94A3B8] mt-1">
+                      <span>Search engine snippet text</span>
+                      <span>{(page.meta?.description ?? "").length} chars</span>
+                    </div>
+                  </div>
+
+                  {/* URL Slug */}
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-1.5">
+                      URL Slug
+                    </label>
+                    <div className="flex items-center gap-1 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg px-2.5 py-1.5">
+                      <span className="text-[11px] font-mono text-[#94A3B8]">/</span>
+                      <input
+                        type="text"
+                        className="bg-transparent text-xs font-mono font-bold text-[#0F172A] outline-none flex-1"
+                        value={page.slug}
+                        onChange={(e) =>
+                          setPage((prev) =>
+                            prev
+                              ? { ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }
+                              : null
+                          )
+                        }
+                      />
+                    </div>
+                    <p className="text-[10px] text-[#94A3B8] mt-1">Live URL: aic-techno.com/{page.slug}</p>
+                  </div>
+
+                  {/* Navigation Status */}
+                  <div className="pt-2 border-t border-[#E5E7EB]">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2">
+                      Navigation Bar Status
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleToggleNav}
+                      disabled={togglingNav || page.status !== "published"}
+                      className={`w-full py-2 px-3 rounded-lg text-xs font-bold border flex items-center justify-center gap-2 transition-all ${
+                        page.status !== "published"
+                          ? "opacity-40 cursor-not-allowed bg-[#F1F5F9] text-[#94A3B8] border-[#E2E8F0]"
+                          : page.showInNav
+                          ? "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE] hover:bg-[#DBEAFE]"
+                          : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:bg-[#F1F5F9]"
+                      }`}
+                    >
+                      {togglingNav ? (
+                        <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      ) : page.showInNav ? (
+                        <span>✓ Visible in Website Navigation</span>
+                      ) : (
+                        <span>+ Add to Website Navigation</span>
+                      )}
+                    </button>
+                    {page.status !== "published" && (
+                      <p className="text-[10px] text-amber-700 mt-1.5 italic">
+                        * Page must be published live to enable navigation bar placement.
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>

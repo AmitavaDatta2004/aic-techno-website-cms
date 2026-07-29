@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
-import { getSiteSettings, saveSiteSettings, SiteSettings } from "@/lib/firestore";
+import { getSiteSettings, saveSiteSettings, subscribePages, togglePageInNav, SiteSettings, CustomPage } from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
+import Link from "next/link";
 
 export default function SettingsPage() {
   const [data, setData] = useState<Omit<SiteSettings, "updatedAt">>({
@@ -32,9 +33,18 @@ export default function SettingsPage() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [cmsPages, setCmsPages] = useState<CustomPage[]>([]);
+  const [togglingNavId, setTogglingNavId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   const lastSavedRef = useRef<string>("");
+
+  useEffect(() => {
+    const unsub = subscribePages((pages) => {
+      setCmsPages(pages);
+    });
+    return () => unsub();
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -137,6 +147,22 @@ export default function SettingsPage() {
     setData((prev) => ({ ...prev, [key]: list }));
   };
 
+  const handleToggleNavInSettings = async (page: CustomPage) => {
+    setTogglingNavId(page.id);
+    try {
+      const next = !page.showInNav;
+      await togglePageInNav(page.id, next);
+      setToast({ msg: next ? `"${page.title}" added to navbar!` : `"${page.title}" removed from navbar.`, type: "success" });
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      console.error(err);
+      setToast({ msg: "Failed to update navigation", type: "error" });
+      setTimeout(() => setToast(null), 3000);
+    } finally {
+      setTogglingNavId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col min-h-screen">
@@ -185,12 +211,38 @@ export default function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--cms-muted)] mb-2">Logo Upload</label>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3 flex-wrap">
                 {data.logoUrl && (
-                  <img src={data.logoUrl} alt="Logo preview" className="h-12 w-auto bg-black p-1 rounded" />
+                  <div className="relative group">
+                    <img src={data.logoUrl} alt="Logo preview" className="h-14 w-auto bg-black p-1 rounded border border-[var(--cms-border)]" />
+                    <button
+                      type="button"
+                      onClick={() => setData({ ...data, logoUrl: "" })}
+                      className="absolute -top-2 -right-2 w-5 h-5 bg-[var(--cms-danger)] text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >×</button>
+                  </div>
                 )}
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="text-sm text-[var(--cms-text-2)]" id="logo-upload" />
+                <label
+                  htmlFor="logo-upload"
+                  className="flex items-center gap-2 px-4 py-2 bg-[var(--cms-accent)] hover:opacity-90 active:scale-95 text-white text-xs font-semibold rounded-lg cursor-pointer transition-all select-none"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  {data.logoUrl ? "Replace Logo" : "Upload Logo"}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="sr-only"
+                  id="logo-upload"
+                />
+                {!data.logoUrl && (
+                  <span className="text-xs text-[var(--cms-muted)] italic">No logo uploaded</span>
+                )}
               </div>
+
             </div>
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--cms-muted)] mb-2" htmlFor="logoAlt">
@@ -203,6 +255,63 @@ export default function SettingsPage() {
                 onChange={(e) => setData({ ...data, logoAlt: e.target.value })}
               />
             </div>
+          </div>
+        </section>
+
+        {/* 2. Visual Page Builder Pages in Navigation */}
+        <section className="cms-card p-6 space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xs font-bold uppercase tracking-widest text-[var(--cms-muted)]">Visual Builder Pages in Navigation</h2>
+              <p className="text-xs text-[var(--cms-muted)] mt-1">Pages created with the Visual Builder that are visible in the website navbar.</p>
+            </div>
+            <Link
+              href="/dashboard/pages"
+              className="px-3 py-1 bg-[var(--cms-surface-2)] hover:bg-[var(--cms-border)] text-xs font-semibold rounded text-[var(--cms-text-1)] transition-colors"
+            >
+              Manage Pages →
+            </Link>
+          </div>
+
+          <div className="space-y-2">
+            {cmsPages.length === 0 ? (
+              <p className="text-xs text-[var(--cms-muted)] italic">No visual builder pages created yet.</p>
+            ) : (
+              cmsPages.map((p) => (
+                <div key={p.id} className="flex items-center justify-between bg-[var(--cms-surface-2)] p-3 rounded-lg border border-[var(--cms-border)]">
+                  <div className="flex items-center gap-3">
+                    <span className="text-base">📄</span>
+                    <div>
+                      <div className="text-xs font-black text-[var(--cms-text-1)]">{p.title}</div>
+                      <div className="text-[10px] text-[var(--cms-muted)] font-mono">page.html?slug={p.slug}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      p.status === "published" ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"
+                    }`}>
+                      {p.status}
+                    </span>
+
+                    <button
+                      onClick={() => handleToggleNavInSettings(p)}
+                      disabled={togglingNavId === p.id || p.status !== "published"}
+                      title={p.status !== "published" ? "Publish page first to add to navbar" : p.showInNav ? "Click to remove from navbar" : "Click to show in navbar"}
+                      className={`px-3 py-1 rounded text-xs font-bold transition-all ${
+                        p.status !== "published"
+                          ? "opacity-30 cursor-not-allowed bg-slate-100 text-slate-400"
+                          : p.showInNav
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                      }`}
+                    >
+                      {togglingNavId === p.id ? "Saving..." : p.showInNav ? "In Navbar ✓" : "+ Add to Navbar"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 
