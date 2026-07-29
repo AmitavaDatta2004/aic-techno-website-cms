@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
-  getWorkspaceContent,
+  subscribeWorkspaceContent,
   saveWorkspaceContent,
   type WorkspaceContent,
   type WorkspacePlan,
@@ -38,10 +38,20 @@ export default function WorkspacePage() {
   const [newPlan, setNewPlan]         = useState<WorkspacePlan>({ name: "", description: "", icon: "" });
 
   useEffect(() => {
-    getWorkspaceContent().then((d) => {
-      if (d) setData({ title: d.title, subtitle: d.subtitle, email: d.email, bookingUrl: d.bookingUrl, bookingStatus: d.bookingStatus, plans: d.plans });
+    const unsub = subscribeWorkspaceContent((d) => {
+      if (d) {
+        setData({
+          title: d.title ?? DEFAULT_DATA.title,
+          subtitle: d.subtitle ?? DEFAULT_DATA.subtitle,
+          email: d.email ?? DEFAULT_DATA.email,
+          bookingUrl: d.bookingUrl ?? DEFAULT_DATA.bookingUrl,
+          bookingStatus: d.bookingStatus ?? DEFAULT_DATA.bookingStatus,
+          plans: Array.isArray(d.plans) && d.plans.length > 0 ? d.plans : DEFAULT_PLANS,
+        });
+      }
       setLoading(false);
     });
+    return () => unsub();
   }, []);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {

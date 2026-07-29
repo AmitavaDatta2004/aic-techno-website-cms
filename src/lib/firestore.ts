@@ -553,9 +553,29 @@ export interface WorkspaceContent {
   updatedAt?: string;
 }
 
+export function subscribeWorkspaceContent(
+  cb: (data: WorkspaceContent | null) => void
+): Unsubscribe {
+  return onSnapshot(
+    doc(db, SITE_CONTENT, "workspace"),
+    (snap) => {
+      cb(snap.exists() ? (snap.data() as WorkspaceContent) : null);
+    },
+    (err) => {
+      console.error("Workspace subscribe error:", err);
+      cb(null);
+    }
+  );
+}
+
 export async function getWorkspaceContent(): Promise<WorkspaceContent | null> {
-  const snap = await getDoc(doc(db, SITE_CONTENT, "workspace"));
-  return snap.exists() ? (snap.data() as WorkspaceContent) : null;
+  try {
+    const snap = await getDoc(doc(db, SITE_CONTENT, "workspace"));
+    return snap.exists() ? (snap.data() as WorkspaceContent) : null;
+  } catch (err) {
+    console.error("Error fetching workspace content:", err);
+    return null;
+  }
 }
 
 export async function saveWorkspaceContent(
@@ -585,9 +605,29 @@ export interface ApplyContent {
   updatedAt?: string;
 }
 
+export function subscribeApplyContent(
+  cb: (data: ApplyContent | null) => void
+): Unsubscribe {
+  return onSnapshot(
+    doc(db, SITE_CONTENT, "apply"),
+    (snap) => {
+      cb(snap.exists() ? (snap.data() as ApplyContent) : null);
+    },
+    (err) => {
+      console.error("Apply subscribe error:", err);
+      cb(null);
+    }
+  );
+}
+
 export async function getApplyContent(): Promise<ApplyContent | null> {
-  const snap = await getDoc(doc(db, SITE_CONTENT, "apply"));
-  return snap.exists() ? (snap.data() as ApplyContent) : null;
+  try {
+    const snap = await getDoc(doc(db, SITE_CONTENT, "apply"));
+    return snap.exists() ? (snap.data() as ApplyContent) : null;
+  } catch (err) {
+    console.error("Error fetching apply content:", err);
+    return null;
+  }
 }
 
 export async function saveApplyContent(

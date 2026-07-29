@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
-  getApplyContent,
+  subscribeApplyContent,
   saveApplyContent,
   type ApplyContent,
   type ApplyStage,
@@ -52,10 +52,17 @@ export default function ApplyPage() {
   });
 
   useEffect(() => {
-    getApplyContent().then((d) => {
-      if (d) setData({ title: d.title, subtitle: d.subtitle, stages: d.stages });
+    const unsub = subscribeApplyContent((d) => {
+      if (d) {
+        setData({
+          title: d.title ?? DEFAULT_DATA.title,
+          subtitle: d.subtitle ?? DEFAULT_DATA.subtitle,
+          stages: Array.isArray(d.stages) && d.stages.length > 0 ? d.stages : DEFAULT_DATA.stages,
+        });
+      }
       setLoading(false);
     });
+    return () => unsub();
   }, []);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {
