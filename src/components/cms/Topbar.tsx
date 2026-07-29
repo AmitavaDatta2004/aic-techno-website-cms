@@ -12,9 +12,10 @@ interface TopbarProps {
   title: string;
   breadcrumb?: string;
   actions?: React.ReactNode;
+  hasUnsavedChanges?: boolean;
 }
 
-export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
+export function Topbar({ title, breadcrumb, actions, hasUnsavedChanges }: TopbarProps) {
   const { user, isAdmin } = useAuth();
 
   const displayName = user?.displayName || user?.email?.split("@")[0] || "Admin";
@@ -43,6 +44,12 @@ export function Topbar({ title, breadcrumb, actions }: TopbarProps) {
         </nav>
         <h1 className="text-xl font-black tracking-tight text-[#0F172A] flex items-center gap-2">
           {title}
+          {hasUnsavedChanges && (
+            <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-xs animate-pulse" title="You have unsaved changes! Click Save Changes to save your work.">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+              Unsaved Changes
+            </span>
+          )}
         </h1>
       </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import { getSiteSettings, saveSiteSettings, SiteSettings } from "@/lib/firestore";
 import { uploadFile, generateStoragePath } from "@/lib/storage";
@@ -34,18 +34,24 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     async function load() {
       try {
         const settings = await getSiteSettings();
         if (settings) {
-          setData({
+          const loaded = {
             ...settings,
             navLinks: settings.navLinks || [],
             footerNavLinks: settings.footerNavLinks || [],
             footerExternalLinks: settings.footerExternalLinks || [],
             socialLinks: settings.socialLinks || []
-          });
+          };
+          setData(loaded);
+          lastSavedRef.current = JSON.stringify(loaded);
+        } else {
+          lastSavedRef.current = JSON.stringify(data);
         }
       } catch (err) {
         console.error(err);
@@ -56,10 +62,26 @@ export default function SettingsPage() {
     load();
   }, []);
 
+  const currentSnapshot = JSON.stringify(data);
+  const hasUnsavedChanges = !loading && currentSnapshot !== lastSavedRef.current;
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
       await saveSiteSettings(data);
+      lastSavedRef.current = currentSnapshot;
       setToast({ msg: "Settings saved successfully!", type: "success" });
       setTimeout(() => setToast(null), 3000);
     } catch (err) {
@@ -128,7 +150,24 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Site Settings" breadcrumb="Settings" />
+      <Topbar
+        title="Site Settings"
+        breadcrumb="Settings"
+        hasUnsavedChanges={hasUnsavedChanges}
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/40 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "cms-btn-primary"
+            }`}
+          >
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Settings *" : "Saved ✓"}
+          </button>
+        }
+      />
       <main className="flex-1 px-8 py-8 space-y-8 animate-fade-in pb-24">
         {toast && (
           <div
@@ -397,10 +436,14 @@ export default function SettingsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-3 bg-[var(--cms-success)] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+            className={`px-6 py-3 rounded-lg text-sm font-extrabold transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/50 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "bg-[#059669] text-white hover:opacity-90"
+            }`}
             id="save-all-btn"
           >
-            {saving ? "Saving..." : "Save All Settings"}
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save All Settings *" : "Saved ✓"}
           </button>
         </div>
       </main>

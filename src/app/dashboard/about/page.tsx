@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
   getAboutTIGContent,
@@ -18,6 +18,9 @@ export default function AboutPage() {
   const [savingTIG, setSavingTIG] = useState(false);
   const [savingAIC, setSavingAIC] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+
+  const lastSavedTigRef = useRef<string>("");
+  const lastSavedAicRef = useRef<string>("");
 
   const [tigData, setTigData] = useState<AboutTIGContent>({
     sectionTag: "",
@@ -46,8 +49,14 @@ export default function AboutPage() {
     async function loadData() {
       try {
         const [tig, aic] = await Promise.all([getAboutTIGContent(), getAboutAICContent()]);
-        if (tig) setTigData(tig);
-        if (aic) setAicData(aic);
+        if (tig) {
+          setTigData(tig);
+          lastSavedTigRef.current = JSON.stringify(tig);
+        }
+        if (aic) {
+          setAicData(aic);
+          lastSavedAicRef.current = JSON.stringify(aic);
+        }
       } catch (err) {
         console.error(err);
         showMessage("Failed to load content", "error");
@@ -58,11 +67,29 @@ export default function AboutPage() {
     loadData();
   }, []);
 
+  const hasUnsavedChanges = !loading && (
+    JSON.stringify(tigData) !== lastSavedTigRef.current ||
+    JSON.stringify(aicData) !== lastSavedAicRef.current
+  );
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
 
   const handleSaveTIG = async () => {
     setSavingTIG(true);
     try {
       await saveAboutTIGContent(tigData);
+      lastSavedTigRef.current = JSON.stringify(tigData);
       showMessage("About TIG saved successfully", "success");
     } catch (err) {
       console.error(err);
@@ -76,6 +103,7 @@ export default function AboutPage() {
     setSavingAIC(true);
     try {
       await saveAboutAICContent(aicData);
+      lastSavedAicRef.current = JSON.stringify(aicData);
       showMessage("About AIC saved successfully", "success");
     } catch (err) {
       console.error(err);
@@ -140,7 +168,7 @@ export default function AboutPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="About Sections" breadcrumb="About" />
+      <Topbar title="About Sections" breadcrumb="About" hasUnsavedChanges={hasUnsavedChanges} />
 
       {/* Message Bar */}
       {message && (

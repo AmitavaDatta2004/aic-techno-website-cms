@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
   subscribeWorkspaceContent,
@@ -37,22 +37,43 @@ export default function WorkspacePage() {
   const [showAddPlan, setShowAddPlan] = useState(false);
   const [newPlan, setNewPlan]         = useState<WorkspacePlan>({ name: "", description: "", icon: "" });
 
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     const unsub = subscribeWorkspaceContent((d) => {
       if (d) {
-        setData({
+        const loaded = {
           title: d.title ?? DEFAULT_DATA.title,
           subtitle: d.subtitle ?? DEFAULT_DATA.subtitle,
           email: d.email ?? DEFAULT_DATA.email,
           bookingUrl: d.bookingUrl ?? DEFAULT_DATA.bookingUrl,
           bookingStatus: d.bookingStatus ?? DEFAULT_DATA.bookingStatus,
           plans: Array.isArray(d.plans) && d.plans.length > 0 ? d.plans : DEFAULT_PLANS,
-        });
+        };
+        setData(loaded);
+        lastSavedRef.current = JSON.stringify(loaded);
+      } else {
+        lastSavedRef.current = JSON.stringify(DEFAULT_DATA);
       }
       setLoading(false);
     });
     return () => unsub();
   }, []);
+
+  const currentSnapshot = JSON.stringify(data);
+  const hasUnsavedChanges = !loading && currentSnapshot !== lastSavedRef.current;
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {
     setToast({ msg, type });
@@ -63,6 +84,7 @@ export default function WorkspacePage() {
     setSaving(true);
     try {
       await saveWorkspaceContent(data);
+      lastSavedRef.current = currentSnapshot;
       showToast("Workspace content saved successfully");
     } catch (e) {
       showToast("Failed to save", "error");
@@ -118,7 +140,24 @@ export default function WorkspacePage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Workspace" breadcrumb="Workspace" />
+      <Topbar
+        title="Workspace"
+        breadcrumb="Workspace"
+        hasUnsavedChanges={hasUnsavedChanges}
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/40 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "cms-btn-primary"
+            }`}
+          >
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Changes *" : "Saved ✓"}
+          </button>
+        }
+      />
 
       {toast && (
         <div className={`fixed top-4 right-4 px-4 py-2.5 rounded-lg shadow-xl z-50 text-sm font-semibold animate-fade-in flex items-center gap-2 ${

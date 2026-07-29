@@ -675,9 +675,15 @@ export default function MentorsPage() {
     },
   ].filter((g) => g.items.length > 0);
 
+  const hasAnyUnsavedChanges = mentors.some((m) => {
+    const oldDbM = dbMentorsRef.current.find((d) => d.id === m.id);
+    if (!oldDbM) return false;
+    return m.active !== oldDbM.active || m.order !== oldDbM.order;
+  });
+
   return (
     <div className="flex flex-col min-h-screen" style={{ background: "var(--cms-bg)" }}>
-      <Topbar title="Board Members Management" breadcrumb="Board Members" />
+      <Topbar title="Board Members Management" breadcrumb="Board Members" hasUnsavedChanges={hasAnyUnsavedChanges} />
 
       {toast && (
         <div className={`fixed top-5 right-5 z-[60] flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-xl text-xs font-semibold animate-fade-in border ${

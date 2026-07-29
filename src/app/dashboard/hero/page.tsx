@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import { getHeroContent, saveHeroContent, HeroContent } from "@/lib/firestore";
 
@@ -26,12 +26,17 @@ export default function HeroPage() {
     type: "success" | "error";
   } | null>(null);
 
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     async function loadData() {
       try {
         const fetchedData = await getHeroContent();
         if (fetchedData) {
           setData(fetchedData);
+          lastSavedRef.current = JSON.stringify(fetchedData);
+        } else {
+          lastSavedRef.current = JSON.stringify(defaultHeroContent);
         }
       } catch (error) {
         console.error("Failed to load hero content:", error);
@@ -41,6 +46,21 @@ export default function HeroPage() {
     }
     loadData();
   }, []);
+
+  const currentSnapshot = JSON.stringify(data);
+  const hasUnsavedChanges = !loading && currentSnapshot !== lastSavedRef.current;
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -54,6 +74,7 @@ export default function HeroPage() {
     setStatusMessage(null);
     try {
       await saveHeroContent(data);
+      lastSavedRef.current = currentSnapshot;
       setStatusMessage({
         text: "Hero content saved successfully!",
         type: "success",
@@ -87,7 +108,24 @@ export default function HeroPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Hero Section" breadcrumb="Hero" />
+      <Topbar
+        title="Hero Section"
+        breadcrumb="Hero"
+        hasUnsavedChanges={hasUnsavedChanges}
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/40 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "cms-btn-primary"
+            }`}
+          >
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Changes *" : "Saved ✓"}
+          </button>
+        }
+      />
       <main className="flex-1 px-8 py-8 space-y-6 animate-fade-in">
         {statusMessage && (
           <div
@@ -271,9 +309,13 @@ export default function HeroPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-6 py-2 rounded-lg text-sm font-semibold text-white bg-[var(--cms-success)] hover:opacity-90 transition-opacity disabled:opacity-50"
+              className={`px-6 py-2.5 rounded-lg text-sm font-extrabold transition-all ${
+                hasUnsavedChanges
+                  ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/50 hover:bg-amber-300 animate-pulse cursor-pointer"
+                  : "bg-[#059669] text-white hover:opacity-90"
+              }`}
             >
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? "Saving..." : hasUnsavedChanges ? "Save Changes *" : "Saved ✓"}
             </button>
           </div>
         </div>

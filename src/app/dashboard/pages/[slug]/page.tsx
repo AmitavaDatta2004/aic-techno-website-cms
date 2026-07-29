@@ -3,7 +3,7 @@
 // Full-screen Visual Page Builder Editor interface.
 // Layout: Topbar + 3-column split (Left: Component Library, Center: Canvas, Right: Properties Panel)
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -46,12 +46,19 @@ export default function PageEditor({
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     async function load() {
       try {
         const docData = await getPage(params.slug);
         if (docData) {
           setPage(docData);
+          lastSavedRef.current = JSON.stringify({
+            title: docData.title,
+            meta: docData.meta,
+            components: docData.components,
+          });
         } else {
           showToast("Page not found", "error");
           router.push("/dashboard/pages");
@@ -65,6 +72,23 @@ export default function PageEditor({
     }
     load();
   }, [params.slug, router]);
+
+  const currentSnapshot = page
+    ? JSON.stringify({ title: page.title, meta: page.meta, components: page.components })
+    : "";
+  const hasUnsavedChanges = page ? currentSnapshot !== lastSavedRef.current : false;
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   function showToast(msg: string, type: "success" | "error" = "success") {
     setToast({ msg, type });
@@ -176,6 +200,7 @@ export default function PageEditor({
         meta: page.meta,
         components: page.components,
       });
+      lastSavedRef.current = currentSnapshot;
       showToast("Draft saved!");
     } catch (err) {
       console.error(err);
@@ -195,6 +220,7 @@ export default function PageEditor({
         components: page.components,
       });
       await publishPage(page.id);
+      lastSavedRef.current = currentSnapshot;
       setPage((prev) => (prev ? { ...prev, status: "published" } : null));
       showToast("Page published live!");
     } catch (err) {
@@ -239,7 +265,12 @@ export default function PageEditor({
         {/* Left: Back & Title */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => router.push("/dashboard/pages")}
+            onClick={() => {
+              if (hasUnsavedChanges && !confirm("You have unsaved changes. Are you sure you want to go back without saving?")) {
+                return;
+              }
+              router.push("/dashboard/pages");
+            }}
             className="p-1.5 hover:bg-[#F1F5F9] rounded-lg text-[#64748B] transition-colors"
             title="Back to Pages"
           >
@@ -300,16 +331,26 @@ export default function PageEditor({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          {/* Status Badge */}
-          <span
-            className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-              page.status === "published"
-                ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
-                : "bg-[#F1F5F9] text-[#64748B] border-[#E2E8F0]"
-            }`}
-          >
-            ● {page.status}
-          </span>
+          {/* Unsaved Changes / Status Badge */}
+          {hasUnsavedChanges ? (
+            <span
+              className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 flex items-center gap-1.5 shadow-xs animate-pulse"
+              title="You have unsaved changes! Click Save Changes to save your work."
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+              Unsaved Changes
+            </span>
+          ) : (
+            <span
+              className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${
+                page.status === "published"
+                  ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                  : "bg-[#F1F5F9] text-[#64748B] border-[#E2E8F0]"
+              }`}
+            >
+              ● {page.status}
+            </span>
+          )}
 
           <a
             href={`page.html?slug=${page.slug}`}
@@ -325,10 +366,15 @@ export default function PageEditor({
           <button
             onClick={handleSaveDraft}
             disabled={saving}
-            className="cms-btn-secondary text-xs py-1.5 px-3"
+            className={`text-xs py-1.5 px-3 rounded-lg font-extrabold flex items-center gap-1.5 transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/50 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "cms-btn-secondary text-[#64748B]"
+            }`}
+            title={hasUnsavedChanges ? "You have unsaved changes! Click to save." : "Save Draft"}
           >
             <Save className="w-3.5 h-3.5" />
-            <span>{saving ? "Saving..." : "Save Draft"}</span>
+            <span>{saving ? "Saving..." : hasUnsavedChanges ? "Save Changes *" : "Save Draft"}</span>
           </button>
 
           {/* Toggle Publish / Unpublish Button */}

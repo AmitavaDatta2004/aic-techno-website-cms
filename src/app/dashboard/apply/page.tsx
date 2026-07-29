@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Topbar } from "@/components/cms/Topbar";
 import {
   subscribeApplyContent,
@@ -51,19 +51,40 @@ export default function ApplyPage() {
     title: "", description: "", applyUrl: "", icon: "",
   });
 
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     const unsub = subscribeApplyContent((d) => {
       if (d) {
-        setData({
+        const loaded = {
           title: d.title ?? DEFAULT_DATA.title,
           subtitle: d.subtitle ?? DEFAULT_DATA.subtitle,
           stages: Array.isArray(d.stages) && d.stages.length > 0 ? d.stages : DEFAULT_DATA.stages,
-        });
+        };
+        setData(loaded);
+        lastSavedRef.current = JSON.stringify(loaded);
+      } else {
+        lastSavedRef.current = JSON.stringify(DEFAULT_DATA);
       }
       setLoading(false);
     });
     return () => unsub();
   }, []);
+
+  const currentSnapshot = JSON.stringify(data);
+  const hasUnsavedChanges = !loading && currentSnapshot !== lastSavedRef.current;
+
+  useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "You have unsaved changes. If you leave now, your changes will be lost.";
+        return e.returnValue;
+      }
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const showToast = (msg: string, type: "success" | "error" = "success") => {
     setToast({ msg, type });
@@ -74,6 +95,7 @@ export default function ApplyPage() {
     setSaving(true);
     try {
       await saveApplyContent(data);
+      lastSavedRef.current = currentSnapshot;
       showToast("Apply section saved successfully");
     } catch (e) {
       showToast("Failed to save", "error");
@@ -128,7 +150,24 @@ export default function ApplyPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Topbar title="Apply Stages" breadcrumb="Apply Stages" />
+      <Topbar
+        title="Apply Stages"
+        breadcrumb="Apply Stages"
+        hasUnsavedChanges={hasUnsavedChanges}
+        actions={
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={`px-4 py-2 rounded-lg text-xs font-black transition-all ${
+              hasUnsavedChanges
+                ? "bg-amber-400 text-amber-950 border border-amber-500 shadow-md ring-2 ring-amber-400/40 hover:bg-amber-300 animate-pulse cursor-pointer"
+                : "cms-btn-primary"
+            }`}
+          >
+            {saving ? "Saving..." : hasUnsavedChanges ? "Save Changes *" : "Saved ✓"}
+          </button>
+        }
+      />
 
       {toast && (
         <div className={`fixed top-4 right-4 px-4 py-2.5 rounded-lg shadow-xl z-50 text-sm font-semibold animate-fade-in flex items-center gap-2 ${
