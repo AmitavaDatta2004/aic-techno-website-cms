@@ -665,6 +665,8 @@ export interface CustomPage {
   published?: boolean;   // Firestore boolean mirror of status for query compatibility
   showInNav?: boolean;   // if true, this page appears in the site navbar
   navOrder?: number;     // sort order in the navbar (lower = earlier)
+  showOnHome?: boolean;  // if true, this page appears as a section on index.html
+  homeOrder?: number;    // sort order on the home page
   meta: PageMeta;
   components: PageComponent[];
   order?: number;

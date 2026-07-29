@@ -248,6 +248,19 @@ export default function PageEditor({
     }
   }
 
+  async function handleToggleHome() {
+    if (!page) return;
+    const newShowOnHome = !page.showOnHome;
+    try {
+      await updatePage(page.id, { showOnHome: newShowOnHome });
+      setPage((prev) => (prev ? { ...prev, showOnHome: newShowOnHome } : null));
+      showToast(newShowOnHome ? "Added section to Homepage!" : "Removed section from Homepage!");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to update homepage status", "error");
+    }
+  }
+
   async function handleToggleNav() {
     if (!page) return;
     setTogglingNav(true);
@@ -391,6 +404,22 @@ export default function PageEditor({
               </svg>
             )}
             <span>{page.showInNav ? "In Nav ✓" : "Add to Nav"}</span>
+          </button>
+
+          <button
+            onClick={handleToggleHome}
+            disabled={page.status !== "published"}
+            title={page.status !== "published" ? "Publish the page first to display on homepage" : page.showOnHome ? "Remove section from homepage" : "Display as a section on the homepage"}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+              page.status !== "published"
+                ? "opacity-40 cursor-not-allowed bg-[#F1F5F9] text-[#94A3B8] border-[#E2E8F0]"
+                : page.showOnHome
+                ? "bg-[#FAF5FF] text-[#7E22CE] border-[#E9D5FF] hover:bg-[#F3E8FF]"
+                : "bg-white text-[#64748B] border-[#E2E8F0] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+            }`}
+          >
+            <Globe className="w-3.5 h-3.5" />
+            <span>{page.showOnHome ? "On Home ✓" : "Add to Home"}</span>
           </button>
 
           <a
