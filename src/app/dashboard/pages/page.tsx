@@ -21,23 +21,50 @@ import {
   subscribePages,
   addPage,
   deletePage,
+  publishPage,
+  unpublishPage,
   type CustomPage,
 } from "@/lib/firestore";
 import { TemplatePickerModal } from "./components/TemplatePickerModal";
 
-// ─── Status Badge ─────────────────────────────────────────────────────────────
+// ─── Status Toggle ─────────────────────────────────────────────────────────────
 
-function StatusBadge({ status }: { status: "draft" | "published" }) {
-  return status === "published" ? (
-    <span className="cms-badge bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
-      <Globe className="w-3 h-3" />
-      Published
-    </span>
-  ) : (
-    <span className="cms-badge bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]">
-      <FileText className="w-3 h-3" />
-      Draft
-    </span>
+function StatusToggle({
+  status,
+  onToggle,
+  toggling,
+}: {
+  status: "draft" | "published";
+  onToggle: () => void;
+  toggling: boolean;
+}) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
+      disabled={toggling}
+      title={
+        status === "published"
+          ? "Click to Unpublish (set to Draft)"
+          : "Click to Publish Live"
+      }
+      className={`cms-badge cursor-pointer transition-all hover:scale-105 active:scale-95 ${
+        status === "published"
+          ? "bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0] hover:bg-[#D1FAE5]"
+          : "bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] hover:bg-[#E2E8F0]"
+      }`}
+    >
+      {toggling ? (
+        <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+      ) : status === "published" ? (
+        <Globe className="w-3 h-3 shrink-0" />
+      ) : (
+        <FileText className="w-3 h-3 shrink-0" />
+      )}
+      <span className="capitalize">{toggling ? "Saving..." : status}</span>
+    </button>
   );
 }
 
@@ -48,6 +75,8 @@ interface PageCardProps {
   onEdit: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onTogglePublish: () => void;
+  toggling: boolean;
 }
 
 const TEMPLATE_ICONS: Record<string, string> = {
@@ -60,7 +89,14 @@ const TEMPLATE_ICONS: Record<string, string> = {
   custom:   "✏️",
 };
 
-function PageCard({ page, onEdit, onDuplicate, onDelete }: PageCardProps) {
+function PageCard({
+  page,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  onTogglePublish,
+  toggling,
+}: PageCardProps) {
   const [confirming, setConfirming] = useState(false);
 
   function handleDelete() {
@@ -82,13 +118,19 @@ function PageCard({ page, onEdit, onDuplicate, onDelete }: PageCardProps) {
             {TEMPLATE_ICONS[page.template] ?? "📄"}
           </span>
           <div className="min-w-0">
-            <h3 className="text-sm font-black text-[#0F172A] truncate">{page.title}</h3>
-            <p className="text-[11px] text-[#94A3B8] font-mono mt-0.5 truncate">
+            <h3 className="font-black text-sm text-[#0F172A] truncate group-hover:text-[#800020] transition-colors">
+              {page.title}
+            </h3>
+            <p className="text-[11px] text-[#94A3B8] font-mono truncate">
               /{page.slug}
             </p>
           </div>
         </div>
-        <StatusBadge status={page.status} />
+        <StatusToggle
+          status={page.status}
+          onToggle={onTogglePublish}
+          toggling={toggling}
+        />
       </div>
 
       {/* Meta */}
@@ -117,7 +159,7 @@ function PageCard({ page, onEdit, onDuplicate, onDelete }: PageCardProps) {
         </button>
 
         <a
-          href={`https://aic-techno.com/${page.slug}`}
+          href={`page.html?slug=${page.slug}`}
           target="_blank"
           rel="noopener noreferrer"
           title="View Live Page"
@@ -157,6 +199,7 @@ export default function PagesListPage() {
   const [pages, setPages] = useState<CustomPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -170,6 +213,24 @@ export default function PagesListPage() {
   function showToast(msg: string, type: "success" | "error" = "success") {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
+  }
+
+  async function handleTogglePublish(page: CustomPage) {
+    setTogglingId(page.id);
+    try {
+      if (page.status === "published") {
+        await unpublishPage(page.id);
+        showToast(`"${page.title}" set to Draft (unpublished)`);
+      } else {
+        await publishPage(page.id);
+        showToast(`"${page.title}" published live!`);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to update status", "error");
+    } finally {
+      setTogglingId(null);
+    }
   }
 
   async function handleCreate(
@@ -268,6 +329,8 @@ export default function PagesListPage() {
                 onEdit={() => router.push(`/dashboard/pages/${page.id}`)}
                 onDuplicate={() => handleDuplicate(page)}
                 onDelete={() => handleDelete(page)}
+                onTogglePublish={() => handleTogglePublish(page)}
+                toggling={togglingId === page.id}
               />
             ))}
 
