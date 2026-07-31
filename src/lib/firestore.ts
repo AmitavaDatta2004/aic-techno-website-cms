@@ -98,6 +98,30 @@ export interface FeaturedPartner {
   updatedAt?: Timestamp;
 }
 
+export interface GalleryItem {
+  id: string;
+  imageUrl: string;
+  caption?: string;
+  order: number;
+  active: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  url: string;
+  source?: string;
+  date?: string;
+  imageUrl?: string;
+  excerpt?: string;
+  order: number;
+  active: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
 export interface MediaFile {
   id: string;
   name: string;
@@ -338,6 +362,92 @@ export async function updateFeaturedPartner(
 
 export async function deleteFeaturedPartner(id: string): Promise<void> {
   await deleteDoc(doc(db, FEATURED_PARTNERS, id));
+}
+
+// ─── Gallery ──────────────────────────────────────────────────────────────────
+
+const GALLERY = "gallery";
+
+export async function getGalleryItems(): Promise<GalleryItem[]> {
+  const snap = await getDocs(collection(db, GALLERY));
+  const items = snapToArray<GalleryItem>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+export function subscribeGalleryItems(
+  cb: (items: GalleryItem[]) => void
+): Unsubscribe {
+  return onSnapshot(collection(db, GALLERY), (snap) => {
+    const items = snapToArray<GalleryItem>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
+}
+
+export async function addGalleryItem(data: Omit<GalleryItem, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, GALLERY), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateGalleryItem(
+  id: string,
+  data: Partial<Omit<GalleryItem, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, GALLERY, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteGalleryItem(id: string): Promise<void> {
+  await deleteDoc(doc(db, GALLERY, id));
+}
+
+// ─── News Articles ────────────────────────────────────────────────────────────
+
+const NEWS_ARTICLES = "newsArticles";
+
+export async function getNewsArticles(): Promise<NewsArticle[]> {
+  const snap = await getDocs(collection(db, NEWS_ARTICLES));
+  const items = snapToArray<NewsArticle>(snap);
+  return items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
+export function subscribeNewsArticles(
+  cb: (articles: NewsArticle[]) => void
+): Unsubscribe {
+  return onSnapshot(collection(db, NEWS_ARTICLES), (snap) => {
+    const items = snapToArray<NewsArticle>(snap);
+    items.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    cb(items);
+  });
+}
+
+export async function addNewsArticle(data: Omit<NewsArticle, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, NEWS_ARTICLES), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateNewsArticle(
+  id: string,
+  data: Partial<Omit<NewsArticle, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, NEWS_ARTICLES, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteNewsArticle(id: string): Promise<void> {
+  await deleteDoc(doc(db, NEWS_ARTICLES, id));
 }
 
 // ─── Media ────────────────────────────────────────────────────────────────────

@@ -19,6 +19,8 @@ import {
   LayoutGrid,
   Rocket,
   FileText,
+  Images,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 
@@ -54,6 +56,8 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/partners",      label: "Partners",      icon: Building2,      badge: "Dynamic" },
       { href: "/dashboard/workspace",     label: "Workspace",     icon: LayoutGrid,     badge: "Dynamic" },
       { href: "/dashboard/apply",         label: "Apply Stages",  icon: Rocket,         badge: "Dynamic" },
+      { href: "/dashboard/gallery",       label: "Gallery",       icon: Images,         badge: "Dynamic" },
+      { href: "/dashboard/news",          label: "News Articles", icon: Newspaper,      badge: "Dynamic" },
       { href: "/dashboard/media",         label: "Media Library", icon: ImageIcon,      badge: "Storage" },
     ],
   },

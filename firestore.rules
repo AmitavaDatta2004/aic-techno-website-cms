@@ -80,6 +80,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Gallery ───────────────────────────────────────────────────────
+    // Public read, admin-only write
+
+    match /gallery/{itemId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ─── News Articles ─────────────────────────────────────────────────
+    // Public read, admin-only write
+
+    match /newsArticles/{articleId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ─── Deny everything else ──────────────────────────────────────────
     // Any collection not explicitly listed above is denied by default
   }
