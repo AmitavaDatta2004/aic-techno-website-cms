@@ -21,6 +21,10 @@ import {
   FileText,
   Images,
   Newspaper,
+  BadgeCheck,
+  CalendarClock,
+  CalendarDays,
+  Bell,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,6 +63,15 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard/gallery",       label: "Gallery",       icon: Images,         badge: "Dynamic" },
       { href: "/dashboard/news",          label: "News Articles", icon: Newspaper,      badge: "Dynamic" },
       { href: "/dashboard/media",         label: "Media Library", icon: ImageIcon,      badge: "Storage" },
+    ],
+  },
+  {
+    title: "STARTUP PORTAL",
+    items: [
+      { href: "/dashboard/startups",             label: "Startups",      icon: BadgeCheck,    badge: "Logins" },
+      { href: "/dashboard/meetings",             label: "Meetings",      icon: CalendarClock, badge: "Private" },
+      { href: "/dashboard/portal-events",        label: "Events",        icon: CalendarDays },
+      { href: "/dashboard/portal-notifications", label: "Notifications", icon: Bell },
     ],
   },
   {
