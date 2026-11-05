@@ -450,6 +450,190 @@ export async function deleteNewsArticle(id: string): Promise<void> {
   await deleteDoc(doc(db, NEWS_ARTICLES, id));
 }
 
+// ─── Startup Portal ───────────────────────────────────────────────────────────
+// Read by the website's startup-login.html / startup-dashboard.html.
+// startups/{email}: registered startups (doc id = lowercase login email).
+// Accounts are created server-side by /api/admin/startups, not from the client.
+
+export interface Startup {
+  id: string;            // = email
+  name: string;
+  founderName?: string;
+  email: string;
+  phone?: string;
+  stage?: string;        // "Pre-incubation" | "Incubation" | "Acceleration" | "Alumni"
+  active: boolean;
+  invitedAt?: Timestamp;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface Meeting {
+  id: string;
+  startupEmail: string;  // links to startups/{email}; only that startup can read it
+  startupName?: string;
+  title: string;
+  startAt: Timestamp;
+  durationMins?: number;
+  mode?: "In person" | "Online";
+  location?: string;
+  meetingLink?: string;
+  host?: string;
+  agenda?: string;
+  status: "scheduled" | "completed" | "cancelled";
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface PortalEvent {
+  id: string;
+  title: string;
+  startAt: Timestamp;
+  endAt?: Timestamp | null;
+  location?: string;
+  link?: string;
+  linkLabel?: string;
+  description?: string;
+  active: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+export interface PortalNotification {
+  id: string;
+  title: string;
+  body: string;
+  link?: string;
+  linkLabel?: string;
+  pinned: boolean;
+  active: boolean;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+}
+
+const STARTUPS = "startups";
+const MEETINGS = "meetings";
+const PORTAL_EVENTS = "portalEvents";
+const PORTAL_NOTIFICATIONS = "portalNotifications";
+
+function millis(t?: Timestamp | null): number {
+  return t ? t.toMillis() : 0;
+}
+
+export function subscribeStartups(cb: (startups: Startup[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, STARTUPS), (snap) => {
+    const items = snapToArray<Startup>(snap);
+    items.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+    cb(items);
+  });
+}
+
+export async function updateStartup(
+  email: string,
+  data: Partial<Omit<Startup, "id" | "email">>
+): Promise<void> {
+  await updateDoc(doc(db, STARTUPS, email), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export function subscribeMeetings(cb: (meetings: Meeting[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, MEETINGS), (snap) => {
+    const items = snapToArray<Meeting>(snap);
+    items.sort((a, b) => millis(b.startAt) - millis(a.startAt));
+    cb(items);
+  });
+}
+
+export async function addMeeting(data: Omit<Meeting, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, MEETINGS), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateMeeting(id: string, data: Partial<Omit<Meeting, "id">>): Promise<void> {
+  await updateDoc(doc(db, MEETINGS, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deleteMeeting(id: string): Promise<void> {
+  await deleteDoc(doc(db, MEETINGS, id));
+}
+
+export function subscribePortalEvents(cb: (events: PortalEvent[]) => void): Unsubscribe {
+  return onSnapshot(collection(db, PORTAL_EVENTS), (snap) => {
+    const items = snapToArray<PortalEvent>(snap);
+    items.sort((a, b) => millis(b.startAt) - millis(a.startAt));
+    cb(items);
+  });
+}
+
+export async function addPortalEvent(data: Omit<PortalEvent, "id">): Promise<string> {
+  const ref = await addDoc(collection(db, PORTAL_EVENTS), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updatePortalEvent(
+  id: string,
+  data: Partial<Omit<PortalEvent, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, PORTAL_EVENTS, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deletePortalEvent(id: string): Promise<void> {
+  await deleteDoc(doc(db, PORTAL_EVENTS, id));
+}
+
+export function subscribePortalNotifications(
+  cb: (notifications: PortalNotification[]) => void
+): Unsubscribe {
+  return onSnapshot(collection(db, PORTAL_NOTIFICATIONS), (snap) => {
+    const items = snapToArray<PortalNotification>(snap);
+    items.sort(
+      (a, b) => Number(b.pinned) - Number(a.pinned) || millis(b.createdAt) - millis(a.createdAt)
+    );
+    cb(items);
+  });
+}
+
+export async function addPortalNotification(
+  data: Omit<PortalNotification, "id">
+): Promise<string> {
+  const ref = await addDoc(collection(db, PORTAL_NOTIFICATIONS), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updatePortalNotification(
+  id: string,
+  data: Partial<Omit<PortalNotification, "id">>
+): Promise<void> {
+  await updateDoc(doc(db, PORTAL_NOTIFICATIONS, id), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function deletePortalNotification(id: string): Promise<void> {
+  await deleteDoc(doc(db, PORTAL_NOTIFICATIONS, id));
+}
+
 // ─── Media ────────────────────────────────────────────────────────────────────
 
 const MEDIA = "media";

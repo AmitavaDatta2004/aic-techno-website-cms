@@ -96,6 +96,55 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ─── Startup Portal ─────────────────────────────────────────────────
+    // Website pages startup-login.html / startup-dashboard.html; managed from
+    // Dashboard → Startup Portal. A "startup" is a signed-in, email-verified user
+    // whose email has a startups/{email} doc that isn't switched off.
+
+    function isStartup() {
+      return isAuthenticated()
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/startups/$(request.auth.token.email))
+        && get(/databases/$(database)/documents/startups/$(request.auth.token.email)).data.active != false;
+    }
+
+    match /startups/{email} {
+      allow read: if isAdmin() || (isAuthenticated() && request.auth.token.email == email);
+      allow write: if isAdmin();
+    }
+
+    // Private: a startup can only read meetings addressed to its own email.
+    match /meetings/{meetingId} {
+      allow read: if isAdmin() || (isStartup() && resource.data.startupEmail == request.auth.token.email);
+      allow write: if isAdmin();
+    }
+
+    match /portalEvents/{eventId} {
+      allow read: if isAdmin() || isStartup();
+      allow write: if isAdmin();
+    }
+
+    match /portalNotifications/{notificationId} {
+      allow read: if isAdmin() || isStartup();
+      allow write: if isAdmin();
+    }
+
+    // ─── Contact form submissions (website contact.html) ───────────────
+    // Anyone can submit; only admins can read and change the status.
+
+    match /contactSubmissions/{submissionId} {
+      allow create: if request.resource.data.keys().hasOnly(
+          ['name', 'phone', 'email', 'startup', 'stage', 'idea', 'source', 'campaign', 'page', 'status', 'createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 100
+        && request.resource.data.idea is string && request.resource.data.idea.size() <= 2000
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time;
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt']);
+      allow delete: if false;
+    }
+
     // ─── Deny everything else ──────────────────────────────────────────
     // Any collection not explicitly listed above is denied by default
   }
